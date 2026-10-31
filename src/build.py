@@ -7,7 +7,7 @@ from html import escape as E
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'site')
-# Pfad, unter dem die Seite liegt: auf GitHub Pages /niners-faithful-europe, mit eigener Domain leer
+# Pfad, unter dem die Seite liegt: leer (Wurzel von niners-faithful-europe.github.io)
 P = os.environ.get('NFE_BASE', '').rstrip('/')
 
 PAGES = {'kickoff': '', 'playbook': 'playbook/', 'stats': 'stat-sheet/', 'lineup': 'line-up/', 'roster': 'roster/', 'plan': 'game-plan/'}

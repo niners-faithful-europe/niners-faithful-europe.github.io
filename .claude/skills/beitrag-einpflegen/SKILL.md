@@ -36,7 +36,7 @@ Neue Datei `data/articles/<id>.json`, `id` kurz und sprechend (Kleinbuchstaben, 
 Reihenfolge:
 1. Vom Nutzer eingefügter Text.
 2. Original direkt abrufen (WebFetch). NEG-Seite (WordPress): `https://theninerempiregermany.de/wp-json/wp/v2/posts?slug=<slug>&_fields=title,content,date`.
-3. Ist die Seite aus der Sitzung nicht erreichbar: Workflow „NEG-Archiv einlesen (mit Volltexten)“ starten (`gh api -X POST repos/cpracher-cloud/niners-faithful-europe/actions/workflows/archive-scan.yml/dispatches -f ref=main -f "inputs[after]=JJJJ-MM-TT"`), danach `git fetch origin scan && git show origin/scan:scan/neg-archive.json` lesen (Feld `content_html`).
+3. Ist die Seite aus der Sitzung nicht erreichbar: Workflow „NEG-Archiv einlesen (mit Volltexten)“ starten (`gh api -X POST repos/niners-faithful-europe/niners-faithful-europe.github.io/actions/workflows/archive-scan.yml/dispatches -f ref=main -f "inputs[after]=JJJJ-MM-TT"`), danach `git fetch origin scan && git show origin/scan:scan/neg-archive.json` lesen (Feld `content_html`).
 4. Sonst den Nutzer bitten, den Text einzufügen. X-Artikel und -Posts immer so.
 
 ## 3. Übersetzen
@@ -57,7 +57,7 @@ Dann `"en_status": "zu prüfen"` setzen. Erst wenn der Nutzer sagt, dass der Aut
 ## 4. Prüfen und veröffentlichen
 - `pip install markdown` falls nötig, dann `NFE_BASE= python3 src/build.py /tmp/nfe-check` und kontrollieren, dass `/tmp/nfe-check/en/playbook/<id>/index.html` entsteht (nur bei `freigegeben` + `consent`).
 - Committen und auf `main` pushen; der Workflow veröffentlicht in ein bis zwei Minuten.
-- Dem Nutzer den Link nennen: `https://cpracher-cloud.github.io/niners-faithful-europe/en/playbook/<id>/`. Bei `zu prüfen`: sagen, dass die Übersetzung in der Redaktion (`/admin/`, Feld „Volltext (Englisch)“) gegengelesen und dort freigegeben werden kann.
+- Dem Nutzer den Link nennen: `https://niners-faithful-europe.github.io/en/playbook/<id>/`. Bei `zu prüfen`: sagen, dass die Übersetzung in der Redaktion (`/admin/`, Feld „Volltext (Englisch)“) gegengelesen und dort freigegeben werden kann.
 
 ## Offene Übersetzungen finden
 `grep -L '"body_en"' data/articles/*.json` (noch keine Übersetzung) und `grep -l '"zu prüfen"' data/articles/*.json` (wartet auf Freigabe).

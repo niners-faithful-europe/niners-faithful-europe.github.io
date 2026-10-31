@@ -35,7 +35,7 @@ jobs:
       - run: pip install markdown==3.7
       - name: Seite bauen
         env:
-          NFE_BASE: ${{ vars.NFE_BASE || '/niners-faithful-europe' }}
+          NFE_BASE: ${{ vars.NFE_BASE || '' }}
         run: python3 src/build.py site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

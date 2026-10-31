@@ -4,7 +4,7 @@ import html, json, os, re, sys, urllib.request
 
 BASE = 'https://theninerempiregermany.de'
 AFTER = sys.argv[1] if len(sys.argv) > 1 else '2024-11-01'
-UA = {'User-Agent': 'NinersFaithfulEurope-Import/1.0 (+https://cpracher-cloud.github.io/niners-faithful-europe/)'}
+UA = {'User-Agent': 'NinersFaithfulEurope-Import/1.0 (+https://niners-faithful-europe.github.io/)'}
 
 
 def get(url):

@@ -1,6 +1,6 @@
 # Niners Faithful Europe
 
-Deutsch-englische Collab-Plattform für deutschsprachige 49ers-Autoren. Deutsche Beiträge erscheinen als Teaser mit Link zum Original, englische Fassungen im Volltext (übersetzt, vom Autor freigegeben). Seite: https://cpracher-cloud.github.io/niners-faithful-europe/ , Redaktion: `/admin/`.
+Deutsch-englische Collab-Plattform für deutschsprachige 49ers-Autoren. Deutsche Beiträge erscheinen als Teaser mit Link zum Original, englische Fassungen im Volltext (übersetzt, vom Autor freigegeben). Seite: https://niners-faithful-europe.github.io/ , Redaktion: `/admin/`.
 
 ## Regeln
 - Inhalte liegen in `data/articles/<id>.json` (ein Beitrag je Datei) und `data/authors/<KÜRZEL>.json`. Seiten nie von Hand bauen oder `site/` committen: Jeder Push auf `main` baut und veröffentlicht automatisch (`.github/workflows/site.yml`).

@@ -5,13 +5,13 @@ Deutsch-englische Collab-Plattform für deutschsprachige Autoren über die San F
 Unabhängiges Fanprojekt, keine Verbindung zur NFL oder zu den San Francisco 49ers.
 
 ## Redaktion
-Alles wird unter **`/admin/`** gepflegt (https://cpracher-cloud.github.io/niners-faithful-europe/admin/):
+Alles wird unter **`/admin/`** gepflegt (https://niners-faithful-europe.github.io/admin/):
 
 - **Beiträge:** Neue Beiträge kommen täglich um 6:17 Uhr automatisch als „Entwurf“ dazu (Filter „Entwürfe“). Öffnen, Autor wählen, Format und Rubrik prüfen, Status auf „Live“ setzen, speichern. Ablehnen: Status „Abgelehnt“ (wird nicht erneut importiert). Eigene Beiträge über „Neu“ anlegen.
 - **Autoren:** Profile im Line-up, alle mit denselben Angaben: Herkunft, Schreibt für, Schwerpunkt, Faithful seit, Kurzprofil, Website.
 - Nach dem Speichern ist die Seite in ein bis zwei Minuten aktuell.
 
-**Anmelden:** „Sign In with Token“ und einen GitHub-Token eingeben (Fine-grained token, nur für dieses Repo, Berechtigung *Contents: Read and write*; anlegen unter GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens). Der Browser merkt sich die Anmeldung.
+**Anmelden:** „Sign In with Token“ und einen GitHub-Token eingeben (Fine-grained token mit Resource owner `niners-faithful-europe`, nur dieses Repo, Berechtigung *Contents: Read and write*; anlegen unter GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens). Der Browser merkt sich die Anmeldung.
 
 ## Englische Volltexte über Claude
 Beiträge einpflegen und übersetzen geht am einfachsten mit Claude (Claude Code mit Zugriff auf dieses Repo): Link oder Text schicken und sagen „pflege das ein und übersetze es“. Die Arbeitsweise steht in `CLAUDE.md` und im Skill `.claude/skills/beitrag-einpflegen/`. Die Übersetzung landet mit Status „Übersetzt, wartet auf Prüfung“ beim Beitrag; nach Freigabe durch den Autor auf „Vom Autor freigegeben“ setzen (Redaktion oder Claude). Der Volltext erscheint nur, wenn beim Autor „Übersetzung erlaubt“ angehakt ist.
@@ -30,7 +30,7 @@ Der NEG-Feed nennt keinen Autor. Neue NEG-Beiträge kommen deshalb ohne Autor al
 
 ## Lokal bauen
 ```
-python3 src/build.py site            # Seite unter / (eigene Domain)
-NFE_BASE=/niners-faithful-europe python3 src/build.py site   # wie auf GitHub Pages
+
+python3 src/build.py site   # wie auf GitHub Pages (Seite liegt im Wurzelverzeichnis)
 ```
-Für eine eigene Domain unter Settings > Secrets and variables > Actions die Variable `NFE_BASE` auf `/` setzen.
+Die Seite liegt im Wurzelverzeichnis; für einen Unterpfad die Actions-Variable `NFE_BASE` setzen.

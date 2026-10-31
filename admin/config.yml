@@ -2,7 +2,7 @@
 # danach baut GitHub die Seite neu (1 bis 2 Minuten).
 backend:
   name: github
-  repo: cpracher-cloud/niners-faithful-europe
+  repo: niners-faithful-europe/niners-faithful-europe.github.io
   branch: main
   commit_messages:
     create: 'Redaktion: {{collection}} „{{slug}}“ angelegt'
