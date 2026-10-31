@@ -4,25 +4,26 @@ Deutsch-englische Collab-Plattform für deutschsprachige Autoren über die San F
 
 Unabhängiges Fanprojekt, keine Verbindung zur NFL oder zu den San Francisco 49ers.
 
+## Redaktion
+Alles wird unter **`/admin/`** gepflegt (https://cpracher-cloud.github.io/niners-faithful-europe/admin/):
+
+- **Beiträge:** Neue Beiträge kommen täglich um 6:17 Uhr automatisch als „Entwurf“ dazu (Filter „Entwürfe“). Öffnen, Autor wählen, Format und Rubrik prüfen, Status auf „Live“ setzen, speichern. Ablehnen: Status „Abgelehnt“ (wird nicht erneut importiert). Eigene Beiträge über „Neu“ anlegen.
+- **Autoren:** Profile im Line-up, alle mit denselben Angaben: Herkunft, Schreibt für, Schwerpunkt, Faithful seit, Kurzprofil, Website.
+- Nach dem Speichern ist die Seite in ein bis zwei Minuten aktuell.
+
+**Anmelden:** „Sign In with Token“ und einen GitHub-Token eingeben (Fine-grained token, nur für dieses Repo, Berechtigung *Contents: Read and write*; anlegen unter GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens). Der Browser merkt sich die Anmeldung.
+
 ## Aufbau
-- `data/articles.json`: alle Beiträge. `status`: `live` (auf der Seite), `entwurf` (wartet in der Inbox), `abgelehnt` (wird ignoriert und nicht erneut importiert).
+- `data/articles/*.json`: ein Beitrag je Datei. `status`: `live`, `entwurf` oder `abgelehnt`.
+- `data/authors/*.json`: ein Autor je Datei.
 - `data/sources.json`: Quellen für den Import (RSS-Feeds, cp7-Projekte).
-- `src/inbox.py`: legt Freigabe-Issues an und wertet geschlossene Issues aus.
+- `admin/`: Redaktionsoberfläche (Sveltia CMS) und ihre Konfiguration.
 - `src/import_feeds.py`: holt neue Beiträge und legt sie als Entwurf an, mit Vorschlag für Rubrik und Format.
-- `src/build.py`: baut alle Seiten (DE/EN) nach `site/`, inklusive der internen Inbox unter `/de/inbox/`.
+- `src/build.py`: baut alle Seiten (DE/EN) nach `site/`.
 - `src/figs.py`: Bildkatalog je Rubrik. `src/poster.js`: Plakatgrafik (erzeugt `poster_*.svg.txt` und `watermark.svg`).
 
-## Ablauf
-1. Täglich um 6:17 Uhr holt `.github/workflows/site.yml` neue Beiträge und legt zu jedem Entwurf ein **Issue** an („Freigabe: …“). GitHub schickt dazu eine Benachrichtigung (Mail/App).
-2. Im Issue Format, Rubrik und Autor per Häkchen prüfen (direkt anklicken). Anderer Autor oder englische Fassung: vor dem Schließen kommentieren, z. B. `Autor: Vorname Nachname`, `Titel EN: …`, `Teaser EN: …`.
-3. **Close as completed** = freigeben, **Close as not planned** = ablehnen. Der Workflow trägt das in `data/articles.json` ein und veröffentlicht die Seite neu.
-4. Überblick über offene Entwürfe: Inbox unter `/de/inbox/` oder die Issue-Liste.
-
-## Autoren bearbeiten
-Die Profile im Line-up stehen in `data/authors.json`. Bearbeiten geht ohne Datei: In der Inbox (`/de/inbox/`) bei einem Autor auf **Bearbeiten** klicken (öffnet das Formular „Autor anlegen oder ändern“ mit den aktuellen Angaben), Text ändern, absenden. Neue Autoren über **Neuen Autor anlegen**, Entfernen über die Aktion „Entfernen“ mit Kürzel. Der Workflow übernimmt die Änderung, schließt das Issue und veröffentlicht die Seite neu. In Freigabe-Tickets reicht ein Kommentar `Autor: Vorname Nachname`, ein neuer Name wird dabei angelegt.
-
 ## Hinweis Niner Empire Germany
-Der NEG-Feed und die Artikelseiten nennen keinen Autor. Neue NEG-Beiträge kommen deshalb als „Niner Empire Germany“ (Kürzel `NEG`) in die Inbox; bei der Freigabe `aut` und `author` auf den echten Autor setzen (z. B. `CP` / `Chris Pracher`). Podcast-Folgen („Ep. 395 …“) werden übersprungen.
+Der NEG-Feed nennt keinen Autor. Neue NEG-Beiträge kommen deshalb ohne Autor als Entwurf; den Autor in der Redaktion wählen. Podcast-Folgen („Ep. 395 …“) werden übersprungen.
 
 ## Lokal bauen
 ```

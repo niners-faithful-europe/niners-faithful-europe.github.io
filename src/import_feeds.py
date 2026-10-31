@@ -10,7 +10,7 @@ from email.utils import parsedate_to_datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(os.path.dirname(HERE), 'data')
-ART = os.path.join(DATA, 'articles.json')
+ART = os.path.join(DATA, 'articles')  # eine Datei je Beitrag
 SRC = os.path.join(DATA, 'sources.json')
 DIAG = {}
 KNOWN = set()  # bereits erfasste Links, damit bekannte Artikelseiten nicht erneut geladen werden
@@ -56,10 +56,9 @@ def slug(url):
 
 def entry(source, url, title, teaser, date, who):
     text = f'{title} {teaser}'
-    return dict(id=slug(url), status='entwurf', date=date, fmt=guess(text, FMT_HINTS, 'analyse'), rub=guess(text, RUB_HINTS, 'team'),
-                aut=who['aut'], author=who['author'], src=source['name'],
-                title=dict(de=title, en=None), teaser=dict(de=teaser, en=None), link=dict(de=url, en=None),
-                imported=dict(source=source['id']))
+    return dict(id=slug(url), status='entwurf', date=date, title_de=title, title_en='', teaser_de=teaser, teaser_en='',
+                link_de=url, link_en='', fmt=guess(text, FMT_HINTS, 'analyse'), rub=guess(text, RUB_HINTS, 'team'),
+                aut=(who or {}).get('aut', ''), src=source['name'])
 
 
 def from_rss(source, feed_file=None):
@@ -80,8 +79,8 @@ def from_rss(source, feed_file=None):
         if not who_raw and source.get('author_from_page') and norm(link) not in KNOWN:
             who_raw = page_author(link)  # Feed ohne Autorennamen: auf der Artikelseite nachsehen
         SEEN.setdefault(source['id'], set()).add(who_raw)
-        who = source.get('authors', {}).get(who_raw) or source.get('fallback_author')
-        if not who:
+        who = source.get('authors', {}).get(who_raw)
+        if not who and not source.get('all_authors'):
             continue
         date = parsedate_to_datetime(it.findtext('pubDate')).date().isoformat() if it.findtext('pubDate') else ''
         teaser = plain(it.findtext('description') or it.findtext('content:encoded', '', NS))
@@ -116,8 +115,9 @@ def from_cp7(source):
 
 def main():
     feed_file = sys.argv[sys.argv.index('--feed-file') + 1] if '--feed-file' in sys.argv else None
-    arts = json.load(open(ART, encoding='utf-8'))
-    known = {norm(a['link']['de']) for a in arts} | {norm(a['link'].get('en') or '') for a in arts}
+    os.makedirs(ART, exist_ok=True)
+    arts = [json.load(open(os.path.join(ART, f), encoding='utf-8')) for f in os.listdir(ART) if f.endswith('.json')]
+    known = {norm(a.get('link_de')) for a in arts} | {norm(a.get('link_en')) for a in arts if a.get('link_en')}
     KNOWN.update(known)
     ids = {a['id'] for a in arts}
     new, errors = [], []
@@ -125,17 +125,16 @@ def main():
         try:
             items = from_rss(s, feed_file) if s['type'] == 'rss' else from_cp7(s)
             for e in items:
-                if norm(e['link']['de']) in known: continue
+                if norm(e['link_de']) in known: continue
                 while e['id'] in ids: e['id'] += '-2'
-                known.add(norm(e['link']['de'])); ids.add(e['id']); new.append(e)
+                known.add(norm(e['link_de'])); ids.add(e['id']); new.append(e)
         except Exception as ex:  # eine kaputte Quelle soll die anderen nicht aufhalten
             errors.append(f"{s['id']}: {ex}")
-    if new:
-        json.dump(arts + new, open(ART, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    for e in new:
+        json.dump(e, open(os.path.join(ART, e['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        print(f"neu (Entwurf): {e['id']}  |  {e['src']}  |  {e['title_de']}")
     status = dict(neue_entwuerfe=len(new), fehler=errors, autoren_in_feeds={k: sorted(v) for k, v in SEEN.items()}, feeds=DIAG)
     json.dump(status, open(os.path.join(DATA, 'import-status.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    for e in new:
-        print(f"neu (Entwurf): {e['id']}  |  {e['src']}  |  {e['title']['de']}")
     for e in errors:
         print(f'Fehler: {e}', file=sys.stderr)
     print(f'{len(new)} neue Entwürfe, {len(errors)} Fehler')

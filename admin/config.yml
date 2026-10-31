@@ -1,0 +1,91 @@
+# Redaktion für Niners Faithful Europe (Sveltia CMS). Jede gespeicherte Änderung landet als Commit im Repo,
+# danach baut GitHub die Seite neu (1 bis 2 Minuten).
+backend:
+  name: github
+  repo: cpracher-cloud/niners-faithful-europe
+  branch: main
+  commit_messages:
+    create: 'Redaktion: {{collection}} „{{slug}}“ angelegt'
+    update: 'Redaktion: {{collection}} „{{slug}}“ geändert'
+    delete: 'Redaktion: {{collection}} „{{slug}}“ gelöscht'
+
+media_folder: data/media
+public_folder: /media
+
+collections:
+  - name: beitraege
+    label: Beiträge
+    label_singular: Beitrag
+    description: Neue Beiträge kommen täglich automatisch als „Entwurf“ dazu. Zum Veröffentlichen Status auf „Live“ setzen, Autor wählen und speichern.
+    folder: data/articles
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title_de
+    slug: '{{fields.id}}'
+    summary: '{{title_de}}  |  {{status}}  |  {{date | date("DD.MM.YYYY")}}'
+    sortable_fields:
+      fields: [date, title_de, status]
+      default:
+        field: date
+        direction: descending
+    view_filters:
+      - label: Entwürfe (warten auf Freigabe)
+        field: status
+        pattern: entwurf
+      - label: Live
+        field: status
+        pattern: live
+      - label: Abgelehnt
+        field: status
+        pattern: abgelehnt
+    view_groups:
+      - label: Status
+        field: status
+    fields:
+      - {name: status, label: Status, widget: select, default: entwurf, options: [{label: 'Entwurf (wartet auf Freigabe)', value: entwurf}, {label: 'Live (auf der Seite)', value: live}, {label: 'Abgelehnt', value: abgelehnt}]}
+      - {name: title_de, label: Titel (Deutsch), widget: string}
+      - {name: teaser_de, label: Anriss (Deutsch), widget: text, hint: 'Zwei, drei Sätze, die neugierig machen.'}
+      - {name: link_de, label: Link zum Original, widget: string, hint: 'Adresse des deutschen Originals beim Autor.'}
+      - name: aut
+        label: Autor
+        widget: relation
+        collection: autoren
+        value_field: aut
+        search_fields: [name]
+        display_fields: [name]
+        required: false
+        hint: 'Fehlt der Autor? Erst unter „Autoren“ anlegen.'
+      - {name: date, label: Datum, widget: datetime, date_format: 'DD.MM.YYYY', time_format: false, format: 'YYYY-MM-DD'}
+      - {name: fmt, label: Format, widget: select, options: [{label: Analyse, value: analyse}, {label: Fantext, value: fantext}, {label: Grafik, value: grafik}]}
+      - {name: rub, label: Rubrik, widget: select, options: [{label: Spielvorschau, value: vorschau}, {label: Spielnachbericht, value: nachbericht}, {label: Team-Stats, value: team}, {label: Spieler-Stats, value: spieler}, {label: Draft und Kader, value: draft}, {label: Scheme und Tape, value: scheme}]}
+      - {name: src, label: Erschienen bei, widget: string, hint: 'z. B. Niner Empire Germany, cp7, Substack'}
+      - {name: title_en, label: Titel (Englisch), widget: string, required: false}
+      - {name: teaser_en, label: Anriss (Englisch), widget: text, required: false}
+      - {name: link_en, label: Link zur englischen Fassung, widget: string, required: false, hint: 'Leer lassen, wenn es keine gibt.'}
+      - {name: id, label: Kennung, widget: string, pattern: ['^[a-z0-9-]+$', 'Nur Kleinbuchstaben, Ziffern und Bindestriche'], hint: 'Kurzer Name für die Datei, z. B. week-9-vorschau. Nach dem Anlegen nicht mehr ändern.'}
+
+  - name: autoren
+    label: Autoren
+    label_singular: Autor
+    description: Profile im Line-up. Alle Autoren werden gleich vorgestellt.
+    folder: data/authors
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: name
+    slug: '{{fields.aut}}'
+    summary: '{{name}}  |  {{origin}}'
+    fields:
+      - {name: name, label: Name, widget: string}
+      - {name: origin, label: Herkunft, widget: string, hint: 'Stadt, Land, z. B. Nürnberg, Deutschland'}
+      - {name: writes_for, label: Schreibt für, widget: string, hint: 'Verein, Blog oder Kanal, z. B. Niner Empire Germany e.V.'}
+      - {name: focus_de, label: Schwerpunkt (Deutsch), widget: string, hint: 'z. B. Statistik, Draft und Scheme'}
+      - {name: focus_en, label: Schwerpunkt (Englisch), widget: string, required: false}
+      - {name: faithful_since, label: Faithful seit, widget: string, hint: 'Jahr, z. B. 2011'}
+      - {name: bio_de, label: Kurzprofil (Deutsch), widget: text, hint: 'Zwei, drei Sätze.'}
+      - {name: bio_en, label: Kurzprofil (Englisch), widget: text, required: false}
+      - {name: url, label: Website, widget: string, required: false, hint: 'Der Button im Profil heißt immer „Zur Website“.'}
+      - {name: aut, label: Kürzel, widget: string, pattern: ['^[A-Z0-9]{2,4}$', '2 bis 4 Großbuchstaben, z. B. CP'], hint: 'Initialen. Nach dem Anlegen nicht mehr ändern.'}

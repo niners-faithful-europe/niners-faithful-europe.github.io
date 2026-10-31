@@ -1,0 +1,15 @@
+{
+  "id": "qbr",
+  "status": "live",
+  "date": "2026-10-20",
+  "title_de": "QBR Career Stats: 76 Quarterbacks seit 2006",
+  "title_en": "QBR career stats: 76 quarterbacks since 2006",
+  "teaser_de": "Karriere-QBR aller Quarterbacks mit mehr als 1.500 Pässen seit 2006, als Streudiagramm, sortierbare Rangliste und Saisonverlauf.",
+  "teaser_en": "Career QBR of every quarterback with more than 1,500 passes since 2006, as a scatter plot, sortable ranking and season-by-season view.",
+  "link_de": "https://cp7.beer/projects/qbr-career-stats/",
+  "link_en": "https://cp7.beer/projects/qbr-career-stats/",
+  "fmt": "grafik",
+  "rub": "spieler",
+  "aut": "CP",
+  "src": "cp7"
+}

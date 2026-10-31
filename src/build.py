@@ -10,7 +10,7 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'site')
 # Pfad, unter dem die Seite liegt: auf GitHub Pages /niners-faithful-europe, mit eigener Domain leer
 P = os.environ.get('NFE_BASE', '').rstrip('/')
 
-PAGES = {'kickoff': '', 'playbook': 'playbook/', 'stats': 'stat-sheet/', 'lineup': 'line-up/', 'roster': 'roster/', 'plan': 'game-plan/', 'article': 'playbook/career-any-a/', 'inbox': 'inbox/'}
+PAGES = {'kickoff': '', 'playbook': 'playbook/', 'stats': 'stat-sheet/', 'lineup': 'line-up/', 'roster': 'roster/', 'plan': 'game-plan/', 'article': 'playbook/career-any-a/'}
 def url(lang, key): return f'{P}/{lang}/{PAGES[key]}'
 
 T = {
@@ -25,26 +25,30 @@ T = {
 }
 
 NEG = 'https://theninerempiregermany.de/'
-DATA = os.path.join(ROOT, 'data', 'articles.json')
+import glob
+def read_dir(name):
+    """Alle JSON-Dateien eines Datenordners (eine Datei je Beitrag bzw. Autor, gepflegt über /admin/)."""
+    return [json.load(open(f, encoding='utf-8')) for f in sorted(glob.glob(os.path.join(ROOT, 'data', name, '*.json')))]
 MON = (['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'],
        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 def fdate(iso):
-    y, m, d = (int(v) for v in iso.split('-'))
+    y, m, d = (int(v) for v in str(iso)[:10].split('-'))
     return (f'{d}. {MON[0][m - 1]} {y}', f'{MON[1][m - 1]} {d}, {y}')
-def load(status):
-    """Beiträge aus data/articles.json, neueste zuerst, in der Form, die die Seiten erwarten."""
-    out = []
-    for x in json.load(open(DATA, encoding='utf-8')):
-        if x.get('status') != status: continue
-        t, z = x['title'], x.get('teaser') or {}
-        if x.get('aut') in AUTH: x['author'] = AUTH[x['aut']]['name']
-        out.append(dict(x, date=fdate(x['date']), iso=x['date'], title=(t['de'], t.get('en') or t['de']),
-                        teaser=(z.get('de', ''), z.get('en') or z.get('de', '')), de=x['link']['de'], en=x['link'].get('en')))
-    return sorted(out, key=lambda a: a['iso'], reverse=True)
-AUTHORS = json.load(open(os.path.join(ROOT, 'data', 'authors.json'), encoding='utf-8'))
+AUTHORS = sorted(read_dir('authors'), key=lambda x: x['name'])
 AUTH = {x['aut']: x for x in AUTHORS}
+def load(status):
+    """Beiträge mit dem Status, neueste zuerst, in der Form, die die Seiten erwarten."""
+    out = []
+    for x in read_dir('articles'):
+        if x.get('status') != status: continue
+        who = AUTH.get(x.get('aut') or '')
+        out.append(dict(x, aut=x.get('aut') or 'src-' + x.get('src', ''), author=who['name'] if who else x.get('src', ''),
+                        date=fdate(x['date']), iso=str(x['date'])[:10],
+                        title=(x['title_de'], x.get('title_en') or x['title_de']),
+                        teaser=(x.get('teaser_de', ''), x.get('teaser_en') or x.get('teaser_de', '')),
+                        de=x['link_de'], en=x.get('link_en') or None))
+    return sorted(out, key=lambda a: a['iso'], reverse=True)
 ART = load('live')
-DRAFTS = load('entwurf')
 ART_BY = {a['id']: a for a in ART}
 FMT = {'fantext': ('Fantext', 'Fan piece'), 'analyse': ('Analyse', 'Analysis'), 'grafik': ('Grafik', 'Graphic')}
 RUB = [('vorschau', 'Spielvorschau', 'Game previews'), ('nachbericht', 'Spielnachbericht', 'Game reviews'), ('team', 'Team-Stats', 'Team stats'),
@@ -288,14 +292,18 @@ def posts_of(aut=None, src=None, lang='de'):
 def lineup(lang):
     i = I(lang)
     count = lambda n: f'{n} ' + (('Beitrag', 'article') if n == 1 else ('Beiträge', 'articles'))[i]
-    tr = lambda d, fb='': (d or {}).get(lang) or (d or {}).get('de') or fb
+    tr = lambda x, k: x.get(f'{k}_{lang}') or x.get(f'{k}_de') or ''
+    dash = '–'
     items = []
     for n, x in enumerate(AUTHORS):
         posts = posts_of(x['aut'], lang=lang)
-        facts = [(k, v) for k, v in [(('Schwerpunkt', 'Focus')[i], tr(x.get('focus'))), (('Kanäle', 'Channels')[i], x.get('channels', ''))] if v]
-        items.append(dict(id=x['aut'].lower(), mono=x['name'][:1].upper(), cls=('m-red', 'm-ink')[n % 2], name=x['name'], sub=x.get('sub', ''),
+        since = str(x.get('faithful_since') or '').strip()
+        facts = [(('Herkunft', 'From')[i], x.get('origin') or dash), (('Schreibt für', 'Writes for')[i], x.get('writes_for') or dash),
+                 (('Schwerpunkt', 'Focus')[i], tr(x, 'focus') or dash), (('Faithful seit', 'Faithful since')[i], since or dash)]
+        items.append(dict(id=x['aut'].lower(), mono=x['name'][:1].upper(), cls=('m-red', 'm-ink')[n % 2], name=x['name'], sub=x.get('origin') or x.get('writes_for') or '',
                           right=f'<span class="meta" style="color:var(--gold);font-weight:700">{count(len(posts))}</span>',
-                          bio=tr(x.get('bio')), href=x.get('url') or url(lang, 'playbook'), cta=tr(x.get('url_label'), ('Zur Website', 'Visit website')[i]) if x.get('url') else ('Zum Playbook', 'Open the playbook')[i],
+                          bio=tr(x, 'bio'), href=x.get('url') or url(lang, 'playbook'),
+                          cta=('Zur Website', 'Visit website')[i] if x.get('url') else ('Zum Playbook', 'Open the playbook')[i],
                           facts=facts, posts=posts))
     items += [
       dict(id='you', mono='+', cls='m-tint', name=('Dein Platz', 'Your spot')[i], sub=('Deutschland, Österreich, Schweiz', 'Germany, Austria, Switzerland')[i], right=f'<span class="badge badge-open">{("Frei", "Open")[i]}</span>',
@@ -374,34 +382,6 @@ def plan(lang):
     return page(lang, 'plan', 'Game Plan', D['intro'], body)
 
 
-# ---------------- Inbox (intern, nicht verlinkt) ----------------
-ISSUES = 'https://github.com/cpracher-cloud/niners-faithful-europe/issues'
-from urllib.parse import urlencode
-def inbox(lang):
-    def btn(a):
-        n = a.get('imported', {}).get('issue')
-        return f'<a class="btn btn-primary" href="{ISSUES}/{n}" rel="noopener" target="_blank">Prüfen und freigeben</a>' if n else '<span class="meta">Ticket wird beim nächsten Lauf angelegt</span>'
-    rows = ''.join(
-        f'<div class="row"><span class="t"><h2><a href="{a["de"]}" rel="noopener" target="_blank">{E(a["title"][0])}</a></h2><span class="tz">{E(a["teaser"][0])}</span>'
-        f'<span class="meta"><b>Vorschlag: {FMT[a["fmt"]][0]}</b>  |  {E(RUBN[a["rub"]][0])}  |  {E(a["author"])}  |  {a["date"][0]}</span></span>{btn(a)}</div>'
-        for a in DRAFTS) or '<p class="meta">Keine offenen Entwürfe. Neue Beiträge werden täglich um 6:17 Uhr geholt.</p>'
-    def edit(x):
-        q = dict(template='autor.yml', title=f'Autor: {x["name"]}', name=x['name'], kuerzel=x['aut'], sub=x.get('sub', ''), bio_de=(x.get('bio') or {}).get('de', ''),
-                 bio_en=(x.get('bio') or {}).get('en', ''), focus_de=(x.get('focus') or {}).get('de', ''), focus_en=(x.get('focus') or {}).get('en', ''),
-                 channels=x.get('channels', ''), url=x.get('url', ''))
-        return f'{ISSUES}/new?' + urlencode(q)
-    people = ''.join(f'<div class="row"><span class="t"><h2>{E(x["name"])}</h2><span class="meta">Kürzel {E(x["aut"])}  |  {E(x.get("sub", ""))}  |  {len(posts_of(x["aut"]))} {"Beitrag" if len(posts_of(x["aut"])) == 1 else "Beiträge"}</span></span>'
-                     f'<a class="btn btn-ghost" href="{E(edit(x))}" rel="noopener" target="_blank">Bearbeiten</a></div>' for x in AUTHORS)
-    body = f'''<main id="main" class="wrap page"><h1 class="page-title">Inbox</h1>
-<p class="lead-text">{len(DRAFTS)} neue Beiträge warten auf Freigabe. Zu jedem gibt es ein Ticket: Häkchen für Format, Rubrik und Autor direkt anklicken (anderer Autor: Kommentar <code>Autor: Name</code>), dann <b>Close as completed</b> zum Freigeben oder <b>Close as not planned</b> zum Ablehnen. Die Seite aktualisiert sich danach von selbst.</p>
-<div class="actions" style="margin:24px 0 8px"><a class="btn btn-ghost" href="{ISSUES}" rel="noopener" target="_blank">Alle offenen Tickets</a></div>
-<div class="rows">{rows}</div>
-<h2 class="page-title" style="font-size:40px;margin-top:64px">Autoren</h2>
-<p class="lead-text">Profile im Line-up bearbeiten: Formular öffnen, Text ändern, absenden. Die Änderung ist ein bis zwei Minuten später online.</p>
-<div class="actions" style="margin:24px 0 8px"><a class="btn btn-primary" href="{ISSUES}/new?template=autor.yml" rel="noopener" target="_blank">Neuen Autor anlegen</a></div>
-<div class="rows">{people}</div></main>'''
-    return page(lang, 'inbox', 'Inbox', 'Entwürfe aus dem Feed-Import', body)
-
 # ---------------- Ausgabe ----------------
 if os.path.isdir(OUT):
     for name in os.listdir(OUT):
@@ -415,9 +395,8 @@ for lang in ('de', 'en'):
     for key, fn in [('kickoff', kickoff), ('playbook', playbook), ('article', article), ('stats', stats), ('lineup', lineup), ('roster', roster), ('plan', plan)]:
         d = os.path.join(OUT, lang, PAGES[key]); os.makedirs(d, exist_ok=True)
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(fn(lang))
-for lang in ('de', 'en'):
-    d = os.path.join(OUT, lang, PAGES['inbox']); os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(inbox(lang))
+# Redaktion: Sveltia CMS unter /admin/
+shutil.copytree(os.path.join(ROOT, 'admin'), os.path.join(OUT, 'admin'))
 open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(f'''<!doctype html>
 <html lang="de">
 <head>
