@@ -26,9 +26,12 @@ T = {
 
 NEG = 'https://theninerempiregermany.de/'
 import glob
+def clean(v):
+    """Platzhalter aus der Redaktion ("-", "_No response_") wie leere Felder behandeln."""
+    return '' if isinstance(v, str) and v.strip() in ('-', '–', '—', '_No response_') else v
 def read_dir(name):
     """Alle JSON-Dateien eines Datenordners (eine Datei je Beitrag bzw. Autor, gepflegt über /admin/)."""
-    return [json.load(open(f, encoding='utf-8')) for f in sorted(glob.glob(os.path.join(ROOT, 'data', name, '*.json')))]
+    return [{k: clean(v) for k, v in json.load(open(f, encoding='utf-8')).items()} for f in sorted(glob.glob(os.path.join(ROOT, 'data', name, '*.json')))]
 MON = (['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sept.', 'Okt.', 'Nov.', 'Dez.'],
        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
 def fdate(iso):
@@ -276,7 +279,7 @@ def picker_page(lang, key, title, intro, items, square):
         facts = ''.join(f'<div><span>{E(k)}</span>{E(v)}</div>' for k, v in it['facts'])
         panels += (f'<article class="profile" data-panel="{it["id"]}"><div class="top"><span class="mono{sq} big {it["cls"]}" aria-hidden="true">{E(it["mono"])}</span>'
                    f'<div><h2>{E(it["name"])}</h2><span class="meta" style="font-size:15px">{E(it["sub"])}</span></div></div>'
-                   f'<p class="bio">{E(it["bio"])}</p><div class="actions"><a class="btn btn-primary" href="{it["href"]}"{ext(it["href"])}>{E(it["cta"])}</a></div>'
+                   + (f'<p class="bio">{E(it["bio"])}</p>' if it['bio'] else '') + f'<div class="actions"><a class="btn btn-primary" href="{it["href"]}"{ext(it["href"])}>{E(it["cta"])}</a></div>'
                    + (f'<div class="facts">{facts}</div>' if facts else '') + (f'<div class="posts">{posts}</div>' if posts else '') + '</article>')
     body = f'''<main id="main" class="wrap page"><h1 class="page-title">{title}</h1><p class="lead-text">{intro}</p>
 <div class="layout"><div class="picker" role="group" data-picker>{btns}</div><div aria-live="polite">{panels}</div></div></main>'''
