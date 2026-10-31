@@ -1,4 +1,4 @@
-name: Import und Veröffentlichung
+name: Import, Freigabe und Veröffentlichung
 
 on:
   schedule:
@@ -6,9 +6,12 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+  issues:
+    types: [closed]        # Freigabe-Ticket geschlossen: freigeben oder ablehnen
 
 permissions:
   contents: write
+  issues: write
   pages: write
   id-token: write
 
@@ -24,16 +27,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Neue Beiträge als Entwurf importieren
-        if: github.event_name != 'push'
-        run: python3 src/import_feeds.py
-      - name: Importierte Entwürfe sichern
+      - name: Neue Beiträge importieren und Tickets anlegen
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 src/import_feeds.py
+          python3 src/inbox.py open
+      - name: Ticket auswerten
+        if: github.event_name == 'issues'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 src/inbox.py review
+      - name: Daten sichern
         if: github.event_name != 'push'
         run: |
           git config user.name "nfe-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
-          if git diff --cached --quiet; then echo "Keine neuen Daten"; else git commit -m "Import: neue Entwürfe" && git push; fi
+          if git diff --cached --quiet; then echo "Keine neuen Daten"; else git commit -m "Inbox: Daten aktualisiert" && git pull --rebase -q && git push; fi
       - name: Seite bauen
         env:
           NFE_BASE: ${{ vars.NFE_BASE || '/niners-faithful-europe' }}

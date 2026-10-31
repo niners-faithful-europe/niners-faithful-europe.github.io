@@ -370,15 +370,18 @@ def plan(lang):
 
 
 # ---------------- Inbox (intern, nicht verlinkt) ----------------
-EDIT = 'https://github.com/cpracher-cloud/niners-faithful-europe/edit/main/data/articles.json'
+ISSUES = 'https://github.com/cpracher-cloud/niners-faithful-europe/issues'
 def inbox(lang):
+    def btn(a):
+        n = a.get('imported', {}).get('issue')
+        return f'<a class="btn btn-primary" href="{ISSUES}/{n}" rel="noopener" target="_blank">Prüfen und freigeben</a>' if n else '<span class="meta">Ticket wird beim nächsten Lauf angelegt</span>'
     rows = ''.join(
-        f'<a class="row spot" href="{a["de"]}" rel="noopener" target="_blank"><span class="t"><h2>{E(a["title"][0])}</h2><span class="tz">{E(a["teaser"][0])}</span>'
-        f'<span class="meta"><b>Vorschlag: {FMT[a["fmt"]][0]}</b>  |  {E(RUBN[a["rub"]][0])}  |  {E(a["author"])}, {E(a["src"])}  |  {a["date"][0]}  |  id: {E(a["id"])}</span></span></a>'
-        for a in DRAFTS) or '<p class="meta">Keine offenen Entwürfe. Der Import läuft täglich um 6:17 Uhr.</p>'
+        f'<div class="row"><span class="t"><h2><a href="{a["de"]}" rel="noopener" target="_blank">{E(a["title"][0])}</a></h2><span class="tz">{E(a["teaser"][0])}</span>'
+        f'<span class="meta"><b>Vorschlag: {FMT[a["fmt"]][0]}</b>  |  {E(RUBN[a["rub"]][0])}  |  {E(a["author"])}  |  {a["date"][0]}</span></span>{btn(a)}</div>'
+        for a in DRAFTS) or '<p class="meta">Keine offenen Entwürfe. Neue Beiträge werden täglich um 6:17 Uhr geholt.</p>'
     body = f'''<main id="main" class="wrap page"><h1 class="page-title">Inbox</h1>
-<p class="lead-text">{len(DRAFTS)} neue Beiträge aus den Feeds warten auf Freigabe. Rubrik und Format sind Vorschläge. Zum Freigeben in der Datendatei beim Beitrag <code>"status": "entwurf"</code> auf <code>"live"</code> setzen (ablehnen: <code>"abgelehnt"</code>), dabei Rubrik und Format prüfen. Die Seite baut sich danach von selbst neu.</p>
-<div class="actions" style="margin:24px 0 8px"><a class="btn btn-primary" href="{EDIT}" rel="noopener" target="_blank">Datendatei bearbeiten</a></div>
+<p class="lead-text">{len(DRAFTS)} neue Beiträge warten auf Freigabe. Zu jedem gibt es ein Ticket: Häkchen für Format, Rubrik und Autor prüfen, dann <b>Close as completed</b> zum Freigeben oder <b>Close as not planned</b> zum Ablehnen. Die Seite aktualisiert sich danach von selbst.</p>
+<div class="actions" style="margin:24px 0 8px"><a class="btn btn-ghost" href="{ISSUES}" rel="noopener" target="_blank">Alle offenen Tickets</a></div>
 <div class="rows">{rows}</div></main>'''
     return page(lang, 'inbox', 'Inbox', 'Entwürfe aus dem Feed-Import', body)
 
