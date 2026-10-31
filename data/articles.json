@@ -1,0 +1,228 @@
+[
+ {
+  "id": "passer-rating",
+  "status": "live",
+  "date": "2026-10-21",
+  "fmt": "analyse",
+  "rub": "spieler",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "#1 Passer-Rating? Purdys historische Statistiken im Check",
+   "en": "No. 1 in passer rating? Purdy’s historic numbers checked"
+  },
+  "teaser": {
+   "de": "Steht Brock Purdy mit einem Karriere-Passer-Rating von 105,6 zu Recht an der Spitze der ewigen Bestenliste? Gegenproben mit ANY/A und Total QBR und ein Blick auf die noch kleine Stichprobe.",
+   "en": "Does Brock Purdy belong at the top of the all-time list with a career passer rating of 105.6? Cross-checks with ANY/A and Total QBR and a look at the still small sample."
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/1-passer-rating-purdys-historische-statistiken-im-check/",
+   "en": null
+  }
+ },
+ {
+  "id": "career-any-a",
+  "status": "live",
+  "date": "2026-10-20",
+  "fmt": "analyse",
+  "rub": "spieler",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "cp7",
+  "title": {
+   "de": "Career ANY/A: Was die Bestenliste wirklich verrät",
+   "en": "Career ANY/A: What the all-time leaderboard really tells us"
+  },
+  "teaser": {
+   "de": "Purdy führt die ewige ANY/A-Bestenliste mit 8,00 an. Was die Kennzahl misst, was sie ausklammert und wie stark die Epoche mitspielt.",
+   "en": "Purdy leads the all-time ANY/A list at 8.00. What the metric measures, what it leaves out and how much the era matters."
+  },
+  "link": {
+   "de": "https://cp7.beer/projects/career-any-a/",
+   "en": "article"
+  }
+ },
+ {
+  "id": "qbr",
+  "status": "live",
+  "date": "2026-10-20",
+  "fmt": "grafik",
+  "rub": "spieler",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "cp7",
+  "title": {
+   "de": "QBR Career Stats: 76 Quarterbacks seit 2006",
+   "en": "QBR career stats: 76 quarterbacks since 2006"
+  },
+  "teaser": {
+   "de": "Karriere-QBR aller Quarterbacks mit mehr als 1.500 Pässen seit 2006, als Streudiagramm, sortierbare Rangliste und Saisonverlauf.",
+   "en": "Career QBR of every quarterback with more than 1,500 passes since 2006, as a scatter plot, sortable ranking and season-by-season view."
+  },
+  "link": {
+   "de": "https://cp7.beer/projects/qbr-career-stats/",
+   "en": "https://cp7.beer/projects/qbr-career-stats/"
+  }
+ },
+ {
+  "id": "supplex",
+  "status": "live",
+  "date": "2026-10-06",
+  "fmt": "grafik",
+  "rub": "team",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "cp7",
+  "title": {
+   "de": "SUPPLEX+ Index 2026",
+   "en": "SUPPLEX+ Index 2026"
+  },
+  "teaser": {
+   "de": "Success Rate, Explosive Rate und EPA/Play zu einem Index verbunden: Wie gut funktionieren Offense und Defense aller 32 Teams?",
+   "en": "Success rate, explosive rate and EPA/play combined into one index: how well do the offenses and defenses of all 32 teams work?"
+  },
+  "link": {
+   "de": "https://cp7.beer/projects/supplex-index-2026/",
+   "en": null
+  }
+ },
+ {
+  "id": "roster",
+  "status": "live",
+  "date": "2026-07-24",
+  "fmt": "fantext",
+  "rub": "draft",
+  "aut": "LU",
+  "author": "Lukas",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "53-Man Roster Prediction: Wer schafft es in den finalen Roster?",
+   "en": "53-man roster prediction: who makes the final cut?"
+  },
+  "teaser": {
+   "de": "Vor dem Training Camp ein Tipp für den 53er-Kader. Am engsten wird es bei Receivern, Linebackern und Cornerbacks.",
+   "en": "A pick for the 53-man roster before training camp. The tightest battles are at receiver, linebacker and cornerback."
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/53-man-roster-prediction-pre-training-camp-wer-schafft-es-in-den-finalen-roster-2/",
+   "en": null
+  }
+ },
+ {
+  "id": "season-stats",
+  "status": "live",
+  "date": "2026-07-16",
+  "fmt": "analyse",
+  "rub": "team",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "Season Stats 2025: Offense Deep Dive",
+   "en": "Season stats 2025: offense deep dive"
+  },
+  "teaser": {
+   "de": "Die Offense 2025 in Advanced Stats: ein außergewöhnlich effizientes Passspiel unter Brock Purdy und ein Laufspiel, das nur Mittelmaß war.",
+   "en": "The 2025 offense in advanced stats: an exceptionally efficient passing game under Brock Purdy and a run game that was only average."
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/season-stats-2025-offense-deep-dive/",
+   "en": null
+  }
+ },
+ {
+  "id": "lynch",
+  "status": "live",
+  "date": "2026-05-06",
+  "fmt": "analyse",
+  "rub": "draft",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "Draftet John Lynch wirklich so schlecht?",
+   "en": "Is John Lynch really such a bad drafter?"
+  },
+  "teaser": {
+   "de": "Alle 2.312 Picks von 2017 bis 2025 im Vergleich: Die 49ers landen auf Rang 7 von 32, die Schwächen liegen in Runde 1.",
+   "en": "All 2,312 picks from 2017 to 2025 compared: the 49ers rank 7th of 32, with the weak spot in round one."
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/die-49ers-drafts-unter-john-lynch-in-der-analyse/",
+   "en": null
+  }
+ },
+ {
+  "id": "shanahan",
+  "status": "live",
+  "date": "2025-07-05",
+  "fmt": "fantext",
+  "rub": "scheme",
+  "aut": "CP",
+  "author": "Chris Pracher",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "Die Offense von Kyle Shanahan: Was ist das Besondere am Scheme? Teil 1",
+   "en": "Kyle Shanahan’s offense: what makes the scheme special? Part 1"
+  },
+  "teaser": {
+   "de": "Bevor es um das Scheme selbst geht: Kyle Shanahans Weg durch den Coaching-Tree, vom Assistenten bis zum Head Coach der 49ers.",
+   "en": "Before getting to the scheme itself: Kyle Shanahan’s path through the coaching tree, from assistant to 49ers head coach."
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/die-offense-von-kyle-shanahan-was-ist-das-besondere-am-scheme-teil-1/",
+   "en": null
+  }
+ },
+ {
+  "id": "ein-reisetagebuch-mit-den-san-francisco-49ers",
+  "status": "entwurf",
+  "date": "2026-10-30",
+  "fmt": "analyse",
+  "rub": "team",
+  "aut": "NEG",
+  "author": "Niner Empire Germany",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "Ein Reisetagebuch mit den San Francisco 49ers",
+   "en": null
+  },
+  "teaser": {
+   "de": "…und die Chancen auf mehr Präsenz in Deutschland Es ist Montag, der 26. Oktober 2026 und ich sitze mit einem dicken Grinsen im Flieger von Atlanta zurück nach Frankfurt. In...",
+   "en": null
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/ein-reisetagebuch-mit-den-san-francisco-49ers/",
+   "en": null
+  },
+  "imported": {
+   "source": "neg"
+  }
+ },
+ {
+  "id": "brandenburg-chapter-gegruendet",
+  "status": "entwurf",
+  "date": "2026-10-17",
+  "fmt": "analyse",
+  "rub": "team",
+  "aut": "NEG",
+  "author": "Niner Empire Germany",
+  "src": "Niner Empire Germany",
+  "title": {
+   "de": "Brandenburg-Chapter gegründet!",
+   "en": null
+  },
+  "teaser": {
+   "de": "Niner Empire Germany – Brandenburg Chapter: Ein neues Kapitel beginnt Am 10.10.2026 war es endlich so weit: Das Brandenburg-Chapter des Niner Empire Germany e.V wurde gegründet – und das natürlich...",
+   "en": null
+  },
+  "link": {
+   "de": "https://theninerempiregermany.de/brandenburg-chapter-gegruendet/",
+   "en": null
+  },
+  "imported": {
+   "source": "neg"
+  }
+ }
+]

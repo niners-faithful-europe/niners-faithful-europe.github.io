@@ -1,0 +1,34 @@
+{
+ "neue_entwuerfe": 2,
+ "fehler": [],
+ "autoren_in_feeds": {
+  "neg": [
+   ""
+  ]
+ },
+ "feeds": {
+  "neg": {
+   "eintraege": 10,
+   "felder": [
+    "category",
+    "comments",
+    "description",
+    "guid",
+    "link",
+    "pubDate",
+    "title",
+    "{com-wordpress:feed-additions:1}post-id",
+    "{http://purl.org/dc/elements/1.1/}creator",
+    "{http://purl.org/rss/1.0/modules/slash/}comments",
+    "{http://wellformedweb.org/CommentAPI/}commentRss"
+   ],
+   "titel": [
+    "Ein Reisetagebuch mit den San Francisco 49ers",
+    "Ep. 395 – Shit happens",
+    "#1 Passer-Rating? Purdys historische Statistiken im Check",
+    "Ep. 394 – Trap Game Week?",
+    "Ep. 393 – Geschichten aus dem Levi’s Stadium und 6-0!"
+   ]
+  }
+ }
+}

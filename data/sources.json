@@ -1,0 +1,29 @@
+{
+ "_hinweis": "Abgelehnte Beiträge bekommen status: abgelehnt und werden nicht erneut importiert. Quellen für den automatischen Import. Neue Beiträge landen als Entwurf (status: entwurf) in articles.json und erscheinen erst nach Freigabe (status: live). authors ordnet den Autorennamen im Feed einem Kürzel zu; Beiträge anderer Autoren werden übersprungen.",
+ "sources": [
+  {
+   "id": "neg",
+   "type": "rss",
+   "name": "Niner Empire Germany",
+   "url": "https://theninerempiregermany.de/feed/",
+   "author_from_page": true,
+   "fallback_author": {"aut": "NEG", "author": "Niner Empire Germany"},
+   "skip_titles": ["^Ep\\. ?\\d+"],
+   "authors": {
+    "Chris Pracher": {"aut": "CP", "author": "Chris Pracher"},
+    "Chris": {"aut": "CP", "author": "Chris Pracher"},
+    "Lukas": {"aut": "LU", "author": "Lukas"}
+   }
+  },
+  {
+   "id": "cp7",
+   "type": "cp7-projects",
+   "name": "cp7",
+   "url": "https://cp7.beer/projects.json",
+   "base": "https://cp7.beer/projects/",
+   "author": {"aut": "CP", "author": "Chris Pracher"},
+   "exclude": ["niners-faithful-europe", "neg-artikel-purdy-passer-rating"],
+   "keywords": ["nfl", "49ers", "niners", "quarterback", "qb", "purdy", "draft", "any/a", "qbr", "epa", "passer", "roster", "saison", "season", "offense", "defense", "touchdown", "supplex", "football", "shanahan", "lynch"]
+  }
+ ]
+}
