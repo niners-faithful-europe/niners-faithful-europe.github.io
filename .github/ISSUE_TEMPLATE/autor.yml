@@ -1,0 +1,60 @@
+name: Autor anlegen oder ändern
+description: Profil im Line-up anlegen, ändern oder entfernen. Leere Felder bleiben beim Ändern unverändert.
+title: "Autor: "
+labels: [autor]
+body:
+  - type: dropdown
+    id: aktion
+    attributes:
+      label: Aktion
+      options:
+        - Anlegen oder ändern
+        - Entfernen
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: So erscheint der Autor auf der Seite. Beim Ändern eines bestehenden Autors kann hier auch ein neuer Name stehen, wenn das Kürzel ausgefüllt ist.
+    validations:
+      required: true
+  - type: input
+    id: kuerzel
+    attributes:
+      label: Kürzel
+      description: Nur zum Ändern oder Entfernen eines bestehenden Autors (z. B. CP). Für neue Autoren leer lassen, es wird automatisch vergeben.
+  - type: input
+    id: sub
+    attributes:
+      label: Verein oder Kanal
+      placeholder: Niner Empire Germany e.V., eigener Substack
+  - type: textarea
+    id: bio_de
+    attributes:
+      label: Kurzprofil (Deutsch)
+  - type: textarea
+    id: bio_en
+    attributes:
+      label: Kurzprofil (Englisch)
+      description: Leer lassen, dann erscheint auf der englischen Seite der deutsche Text.
+  - type: input
+    id: focus_de
+    attributes:
+      label: Schwerpunkt (Deutsch)
+      placeholder: Statistik, Draft und Scheme
+  - type: input
+    id: focus_en
+    attributes:
+      label: Schwerpunkt (Englisch)
+      placeholder: Stats, draft and scheme
+  - type: input
+    id: channels
+    attributes:
+      label: Kanäle
+      placeholder: theninerempiregermany.de, substack.com/@name
+  - type: input
+    id: url
+    attributes:
+      label: Website
+      placeholder: https://

@@ -1,0 +1,28 @@
+[
+ {
+  "aut": "CP",
+  "name": "Chris Pracher",
+  "sub": "Niner Empire Germany e.V., cp7",
+  "bio": {
+   "de": "Schreibt für The Niner Empire Germany e.V. und auf cp7 über die 49ers: Quarterback-Statistiken, Draft-Bilanzen, Season Stats und die Offense von Kyle Shanahan.",
+   "en": "Writes about the 49ers for The Niner Empire Germany e.V. and on cp7: quarterback stats, draft records, season stats and Kyle Shanahan’s offense."
+  },
+  "focus": {"de": "Statistik, Draft und Scheme", "en": "Stats, draft and scheme"},
+  "channels": "theninerempiregermany.de, cp7.beer",
+  "url": "https://cp7.beer/",
+  "url_label": {"de": "Zu cp7", "en": "Visit cp7"}
+ },
+ {
+  "aut": "LU",
+  "name": "Lukas",
+  "sub": "Niner Empire Germany e.V.",
+  "bio": {
+   "de": "Schreibt für The Niner Empire Germany e.V. über den Kader der 49ers, etwa mit Roster-Prognosen vor dem Training Camp.",
+   "en": "Writes about the 49ers roster for The Niner Empire Germany e.V., for example with roster predictions before training camp."
+  },
+  "focus": {"de": "Kader und Roster", "en": "Roster"},
+  "channels": "",
+  "url": "https://theninerempiregermany.de/",
+  "url_label": {"de": "Zum Niner Empire Germany", "en": "Visit Niner Empire Germany"}
+ }
+]

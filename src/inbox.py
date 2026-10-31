@@ -4,6 +4,7 @@
   python3 src/inbox.py open     legt für jeden Entwurf ohne Issue eines an (Häkchen für Format, Rubrik, Autor)
   python3 src/inbox.py review   wertet ein geschlossenes Issue aus (Event-Datei aus GITHUB_EVENT_PATH):
                                 "Close as completed" = freigeben, "Close as not planned" = ablehnen
+  python3 src/inbox.py author   verarbeitet ein Issue aus dem Formular "Autor anlegen oder ändern"
 
 Braucht GITHUB_TOKEN und GITHUB_REPOSITORY (in GitHub Actions vorhanden).
 """
@@ -11,6 +12,7 @@ import json, os, re, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ART = os.path.join(os.path.dirname(HERE), 'data', 'articles.json')
+AUT = os.path.join(os.path.dirname(HERE), 'data', 'authors.json')
 MARK = re.compile(r'<!-- nfe-id: ([^ ]+) -->')
 
 FMT = [('analyse', 'Analyse'), ('fantext', 'Fantext'), ('grafik', 'Grafik')]
@@ -35,10 +37,38 @@ def save(arts):
     json.dump(arts, open(ART, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 
-def authors(arts):
-    """Alle bekannten Autoren (Kürzel, Name), NEG als Platzhalter zuletzt."""
-    seen = {(a['aut'], a['author']) for a in arts if a['aut'] != 'NEG'}
-    return sorted(seen, key=lambda x: x[1]) + [('NEG', 'Niner Empire Germany (Autor unbekannt)')]
+def load_authors():
+    return json.load(open(AUT, encoding='utf-8'))
+
+
+def save_authors(auts):
+    json.dump(auts, open(AUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
+def authors(arts=None):
+    """Alle Autoren aus data/authors.json (Kürzel, Name), NEG als Platzhalter zuletzt."""
+    return sorted(((x['aut'], x['name']) for x in load_authors()), key=lambda x: x[1]) + [('NEG', 'Niner Empire Germany (Autor unbekannt)')]
+
+
+def new_code(name, auts):
+    """Kürzel aus den Initialen, bei Bedarf mit Ziffer eindeutig gemacht."""
+    parts = re.findall(r'[A-Za-zÄÖÜäöü]+', name) or ['X']
+    base = (parts[0][0] + (parts[-1][0] if len(parts) > 1 else parts[0][1:2])).upper().replace('Ä', 'A').replace('Ö', 'O').replace('Ü', 'U')
+    taken = {x['aut'] for x in auts} | {'NEG'}
+    code, n = base, 2
+    while code in taken:
+        code, n = f'{base}{n}', n + 1
+    return code
+
+
+def find_or_create(name, auts):
+    """Autor per Name finden oder als neues Profil (nur mit Namen) anlegen."""
+    hit = next((x for x in auts if x['name'].lower() == name.lower()), None)
+    if hit:
+        return hit, False
+    x = dict(aut=new_code(name, auts), name=name)
+    auts.append(x)
+    return x, True
 
 
 def boxes(options, current):
@@ -66,6 +96,8 @@ Häkchen bei Bedarf umsetzen (je Abschnitt eins; den Vorschlag musst du nicht ab
 
 ### Autor
 {boxes(authors(arts), a['aut'])}
+
+Neuer Autor (Name, falls oben nicht dabei):
 
 ### Englische Fassung (optional)
 Titel:
@@ -119,6 +151,13 @@ def cmd_review():
         if k:
             a['aut'] = k
             a['author'] = 'Niner Empire Germany' if k == 'NEG' else dict(auts)[k]
+        nm = re.search(r'^Neuer Autor[^:]*:[ \t]*(.+)$', section(text, 'Autor'), re.M)
+        if nm and nm.group(1).strip():
+            people = load_authors()
+            x, created = find_or_create(nm.group(1).strip(), people)
+            if created:
+                save_authors(people)
+            a['aut'], a['author'] = x['aut'], x['name']
         en = section(text, 'Englische Fassung')
         t = re.search(r'^Titel:[ \t]*(.+)$', en, re.M); z = re.search(r'^Teaser:[ \t]*(.+)$', en, re.M)
         if t: a['title']['en'] = t.group(1).strip()
@@ -129,5 +168,54 @@ def cmd_review():
     print(msg)
 
 
+def form(text):
+    """Felder eines Issue-Formulars: Überschrift -> Inhalt (leer bei '_No response_')."""
+    out = {}
+    for m in re.finditer(r'^### (.+?)\n+(.*?)(?=^### |\Z)', text, re.S | re.M):
+        v = m.group(2).strip()
+        out[m.group(1).strip()] = '' if v == '_No response_' else v
+    return out
+
+
+def cmd_author():
+    ev = json.load(open(os.environ['GITHUB_EVENT_PATH'], encoding='utf-8'))
+    iss = ev['issue']
+    if 'autor' not in [l['name'] for l in iss.get('labels', [])]:
+        print('Kein Autoren-Issue.'); return
+    f = form(iss.get('body') or '')
+    auts = load_authors()
+    name, code = f.get('Name', ''), f.get('Kürzel', '').upper()
+    hit = next((x for x in auts if code and x['aut'] == code), None) or next((x for x in auts if name and x['name'].lower() == name.lower()), None)
+    if f.get('Aktion', '').startswith('Entfernen'):
+        if not hit:
+            msg = f'Kein Autor mit Kürzel „{code}“ oder Namen „{name}“ gefunden, nichts geändert.'
+        else:
+            auts.remove(hit); msg = f'{hit["name"]} ({hit["aut"]}) wurde aus dem Line-up entfernt. Bestehende Beiträge bleiben erhalten.'
+    else:
+        x = hit or dict(aut=new_code(name, auts), name=name)
+        if not hit:
+            auts.append(x)
+        if name: x['name'] = name
+        if f.get('Website') and f['Website'] != x.get('url'):
+            x['url'] = f['Website']; x.pop('url_label', None)  # Button heißt dann "Zur Website"
+        for key, field in [('sub', 'Verein oder Kanal'), ('channels', 'Kanäle')]:
+            if f.get(field): x[key] = f[field]
+        for key, de, en in [('bio', 'Kurzprofil (Deutsch)', 'Kurzprofil (Englisch)'), ('focus', 'Schwerpunkt (Deutsch)', 'Schwerpunkt (Englisch)')]:
+            cur = x.setdefault(key, {})
+            if f.get(de): cur['de'] = f[de]
+            if f.get(en): cur['en'] = f[en]
+        msg = (f'{x["name"]} wurde geändert' if hit else f'{x["name"]} wurde angelegt') + f' (Kürzel {x["aut"]}). Das Line-up wird in ein bis zwei Minuten neu veröffentlicht.'
+        # Name auch in bestehenden Beiträgen nachziehen
+        arts = load(); ch = False
+        for a in arts:
+            if a['aut'] == x['aut'] and a['author'] != x['name']:
+                a['author'] = x['name']; ch = True
+        if ch: save(arts)
+    save_authors(auts)
+    api('POST', f"/issues/{iss['number']}/comments", {'body': msg})
+    api('PATCH', f"/issues/{iss['number']}", {'state': 'closed', 'state_reason': 'completed'})
+    print(msg)
+
+
 if __name__ == '__main__':
-    {'open': cmd_open, 'review': cmd_review}[sys.argv[1]]()
+    {'open': cmd_open, 'review': cmd_review, 'author': cmd_author}[sys.argv[1]]()

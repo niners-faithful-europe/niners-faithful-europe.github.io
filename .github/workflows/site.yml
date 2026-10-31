@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
   issues:
-    types: [closed]        # Freigabe-Ticket geschlossen: freigeben oder ablehnen
+    types: [opened, closed]  # Autorenformular abgeschickt / Freigabe-Ticket geschlossen
 
 permissions:
   contents: write
@@ -34,8 +34,13 @@ jobs:
         run: |
           python3 src/import_feeds.py
           python3 src/inbox.py open
-      - name: Ticket auswerten
-        if: github.event_name == 'issues'
+      - name: Autorenformular verarbeiten
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 src/inbox.py author
+      - name: Freigabe-Ticket auswerten
+        if: github.event_name == 'issues' && github.event.action == 'closed'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 src/inbox.py review

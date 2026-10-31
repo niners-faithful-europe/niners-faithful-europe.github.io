@@ -37,9 +37,12 @@ def load(status):
     for x in json.load(open(DATA, encoding='utf-8')):
         if x.get('status') != status: continue
         t, z = x['title'], x.get('teaser') or {}
+        if x.get('aut') in AUTH: x['author'] = AUTH[x['aut']]['name']
         out.append(dict(x, date=fdate(x['date']), iso=x['date'], title=(t['de'], t.get('en') or t['de']),
                         teaser=(z.get('de', ''), z.get('en') or z.get('de', '')), de=x['link']['de'], en=x['link'].get('en')))
     return sorted(out, key=lambda a: a['iso'], reverse=True)
+AUTHORS = json.load(open(os.path.join(ROOT, 'data', 'authors.json'), encoding='utf-8'))
+AUTH = {x['aut']: x for x in AUTHORS}
 ART = load('live')
 DRAFTS = load('entwurf')
 ART_BY = {a['id']: a for a in ART}
@@ -285,14 +288,16 @@ def posts_of(aut=None, src=None, lang='de'):
 def lineup(lang):
     i = I(lang)
     count = lambda n: f'{n} ' + (('Beitrag', 'article') if n == 1 else ('Beiträge', 'articles'))[i]
-    items = [
-      dict(id='cp', mono='C', cls='m-red', name='Chris Pracher', sub='Niner Empire Germany e.V., cp7', right=f'<span class="meta" style="color:var(--gold);font-weight:700">{count(len(posts_of("CP", lang=lang)))}</span>',
-           bio=('Schreibt für The Niner Empire Germany e.V. und auf cp7 über die 49ers: Quarterback-Statistiken, Draft-Bilanzen, Season Stats und die Offense von Kyle Shanahan.',
-                'Writes about the 49ers for The Niner Empire Germany e.V. and on cp7: quarterback stats, draft records, season stats and Kyle Shanahan’s offense.')[i],
-           href='https://cp7.beer/', cta=('Zu cp7', 'Visit cp7')[i], facts=[(('Schwerpunkt', 'Focus')[i], ('Statistik, Draft und Scheme', 'Stats, draft and scheme')[i]), (('Kanäle', 'Channels')[i], 'theninerempiregermany.de, cp7.beer')], posts=posts_of('CP', lang=lang)),
-      dict(id='lu', mono='L', cls='m-ink', name='Lukas', sub='Niner Empire Germany e.V.', right=f'<span class="meta" style="color:var(--gold);font-weight:700">{count(1)}</span>',
-           bio=('Schreibt für The Niner Empire Germany e.V. über den Kader der 49ers, etwa mit Roster-Prognosen vor dem Training Camp.', 'Writes about the 49ers roster for The Niner Empire Germany e.V., for example with roster predictions before training camp.')[i],
-           href=NEG, cta=('Zum Niner Empire Germany', 'Visit Niner Empire Germany')[i], facts=[(('Schwerpunkt', 'Focus')[i], ('Kader und Roster', 'Roster')[i])], posts=posts_of('LU', lang=lang)),
+    tr = lambda d, fb='': (d or {}).get(lang) or (d or {}).get('de') or fb
+    items = []
+    for n, x in enumerate(AUTHORS):
+        posts = posts_of(x['aut'], lang=lang)
+        facts = [(k, v) for k, v in [(('Schwerpunkt', 'Focus')[i], tr(x.get('focus'))), (('Kanäle', 'Channels')[i], x.get('channels', ''))] if v]
+        items.append(dict(id=x['aut'].lower(), mono=x['name'][:1].upper(), cls=('m-red', 'm-ink')[n % 2], name=x['name'], sub=x.get('sub', ''),
+                          right=f'<span class="meta" style="color:var(--gold);font-weight:700">{count(len(posts))}</span>',
+                          bio=tr(x.get('bio')), href=x.get('url') or url(lang, 'playbook'), cta=tr(x.get('url_label'), ('Zur Website', 'Visit website')[i]) if x.get('url') else ('Zum Playbook', 'Open the playbook')[i],
+                          facts=facts, posts=posts))
+    items += [
       dict(id='you', mono='+', cls='m-tint', name=('Dein Platz', 'Your spot')[i], sub=('Deutschland, Österreich, Schweiz', 'Germany, Austria, Switzerland')[i], right=f'<span class="badge badge-open">{("Frei", "Open")[i]}</span>',
            bio=('Du schreibst über die 49ers oder die NFL auf Deutsch? Hier ist Platz für dich. Deine Texte bleiben bei dir, wir kümmern uns um Teaser, englische Fassung und Reichweite.',
                 'Do you write about the 49ers or the NFL in German? There is a spot for you here. Your work stays yours; we handle the teaser, the English version and the reach.')[i],
@@ -371,6 +376,7 @@ def plan(lang):
 
 # ---------------- Inbox (intern, nicht verlinkt) ----------------
 ISSUES = 'https://github.com/cpracher-cloud/niners-faithful-europe/issues'
+from urllib.parse import urlencode
 def inbox(lang):
     def btn(a):
         n = a.get('imported', {}).get('issue')
@@ -379,10 +385,21 @@ def inbox(lang):
         f'<div class="row"><span class="t"><h2><a href="{a["de"]}" rel="noopener" target="_blank">{E(a["title"][0])}</a></h2><span class="tz">{E(a["teaser"][0])}</span>'
         f'<span class="meta"><b>Vorschlag: {FMT[a["fmt"]][0]}</b>  |  {E(RUBN[a["rub"]][0])}  |  {E(a["author"])}  |  {a["date"][0]}</span></span>{btn(a)}</div>'
         for a in DRAFTS) or '<p class="meta">Keine offenen Entwürfe. Neue Beiträge werden täglich um 6:17 Uhr geholt.</p>'
+    def edit(x):
+        q = dict(template='autor.yml', title=f'Autor: {x["name"]}', name=x['name'], kuerzel=x['aut'], sub=x.get('sub', ''), bio_de=(x.get('bio') or {}).get('de', ''),
+                 bio_en=(x.get('bio') or {}).get('en', ''), focus_de=(x.get('focus') or {}).get('de', ''), focus_en=(x.get('focus') or {}).get('en', ''),
+                 channels=x.get('channels', ''), url=x.get('url', ''))
+        return f'{ISSUES}/new?' + urlencode(q)
+    people = ''.join(f'<div class="row"><span class="t"><h2>{E(x["name"])}</h2><span class="meta">Kürzel {E(x["aut"])}  |  {E(x.get("sub", ""))}  |  {len(posts_of(x["aut"]))} {"Beitrag" if len(posts_of(x["aut"])) == 1 else "Beiträge"}</span></span>'
+                     f'<a class="btn btn-ghost" href="{E(edit(x))}" rel="noopener" target="_blank">Bearbeiten</a></div>' for x in AUTHORS)
     body = f'''<main id="main" class="wrap page"><h1 class="page-title">Inbox</h1>
 <p class="lead-text">{len(DRAFTS)} neue Beiträge warten auf Freigabe. Zu jedem gibt es ein Ticket: Häkchen für Format, Rubrik und Autor prüfen, dann <b>Close as completed</b> zum Freigeben oder <b>Close as not planned</b> zum Ablehnen. Die Seite aktualisiert sich danach von selbst.</p>
 <div class="actions" style="margin:24px 0 8px"><a class="btn btn-ghost" href="{ISSUES}" rel="noopener" target="_blank">Alle offenen Tickets</a></div>
-<div class="rows">{rows}</div></main>'''
+<div class="rows">{rows}</div>
+<h2 class="page-title" style="font-size:40px;margin-top:64px">Autoren</h2>
+<p class="lead-text">Profile im Line-up bearbeiten: Formular öffnen, Text ändern, absenden. Die Änderung ist ein bis zwei Minuten später online.</p>
+<div class="actions" style="margin:24px 0 8px"><a class="btn btn-primary" href="{ISSUES}/new?template=autor.yml" rel="noopener" target="_blank">Neuen Autor anlegen</a></div>
+<div class="rows">{people}</div></main>'''
     return page(lang, 'inbox', 'Inbox', 'Entwürfe aus dem Feed-Import', body)
 
 # ---------------- Ausgabe ----------------
