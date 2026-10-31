@@ -1,15 +1,15 @@
 {
-  "id": "ein-reisetagebuch-mit-den-san-francisco-49ers",
   "status": "live",
-  "date": "2026-10-30",
   "title_de": "Ein Reisetagebuch mit den San Francisco 49ers",
-  "title_en": "",
   "teaser_de": "…und die Chancen auf mehr Präsenz in Deutschland Es ist Montag, der 26. Oktober 2026 und ich sitze mit einem dicken Grinsen im Flieger von Atlanta zurück nach Frankfurt. In...",
-  "teaser_en": "",
   "link_de": "https://theninerempiregermany.de/ein-reisetagebuch-mit-den-san-francisco-49ers/",
-  "link_en": "",
-  "fmt": "analyse",
-  "rub": "team",
   "aut": "DR",
-  "src": "Niner Empire Germany"
+  "date": "2026-10-30",
+  "fmt": "fantext",
+  "rub": "nachbericht",
+  "src": "Niner Empire Germany",
+  "title_en": "",
+  "teaser_en": "",
+  "link_en": "",
+  "id": "ein-reisetagebuch-mit-den-san-francisco-49ers"
 }
