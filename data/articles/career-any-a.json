@@ -7,9 +7,15 @@
   "teaser_de": "Purdy führt die ewige ANY/A-Bestenliste mit 8,00 an. Was die Kennzahl misst, was sie ausklammert und wie stark die Epoche mitspielt.",
   "teaser_en": "Purdy leads the all-time ANY/A list at 8.00. What the metric measures, what it leaves out and how much the era matters.",
   "link_de": "https://cp7.beer/projects/career-any-a/",
-  "link_en": "article",
+  "link_en": "",
   "fmt": "analyse",
   "rub": "spieler",
   "aut": "CP",
-  "src": "cp7"
+  "src": "cp7",
+  "en_status": "freigegeben",
+  "body_en": "Brock Purdy leads the all-time list in Adjusted Net Yards per Pass Attempt with 8.00, and his margin of 0.61 over Patrick Mahomes is almost as large as the entire gap between Mahomes in second place and Russell Wilson in 16th (0.64). In early October Purdy even stood at 8.04, before two games at his normal level of around 7.0 pulled him back down a little.\n\nAnyone who hastily concludes from this that the last pick of the 2022 draft is the most efficient quarterback in NFL history should first take a look at what this number actually captures and, just as importantly, what it deliberately leaves out.\n\nTwo details are also important for understanding the table. First, Pro Football Reference requires at least 1,500 pass attempts for the career list, a mark Purdy only passed this October: after six games of the 2026 season he stands at 1,524 attempts and 86 sacks, that is, 1,610 dropbacks. Second, sack data is only available from the early 1960s on, which is why Otto Graham or Sammy Baugh cannot appear at all.\n\n[Read the full dossier with all tables](https://cp7.beer/projects/career-any-a-en/)",
+  "key_de": "Purdys Vorsprung zeigt sich in mehreren Kennzahlen, die Stichprobe ist aber noch kurz: Die Mindestmarke von 1.500 Passversuchen hat er erst im Oktober 2026 überschritten.",
+  "key_en": "Purdy’s lead is real across several metrics, but his sample is still short: he only passed the 1,500-attempt minimum in October 2026.",
+  "method_de": "Karriere-ANY/A nach Pro Football Reference, mindestens 1.500 Passversuche, Datenstand 20. Oktober 2026. Ergänzend Passer Rating und ESPN Total QBR.",
+  "method_en": "Career ANY/A from Pro Football Reference, minimum 1,500 pass attempts, data as of October 20, 2026. Passer rating and ESPN Total QBR as cross-checks."
 }

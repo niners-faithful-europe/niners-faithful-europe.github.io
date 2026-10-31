@@ -63,7 +63,19 @@ collections:
       - {name: src, label: Erschienen bei, widget: string, hint: 'z. B. Niner Empire Germany, cp7, Substack'}
       - {name: title_en, label: Titel (Englisch), widget: string, required: false}
       - {name: teaser_en, label: Anriss (Englisch), widget: text, required: false}
-      - {name: link_en, label: Link zur englischen Fassung, widget: string, required: false, hint: 'Leer lassen, wenn es keine gibt.'}
+      - name: en_status
+        label: Englischer Volltext
+        widget: select
+        required: false
+        default: ''
+        hint: 'Erscheint erst bei „Vom Autor freigegeben“ und wenn der Autor der Übersetzung zugestimmt hat.'
+        options: [{label: 'Kein Volltext', value: ''}, {label: 'Übersetzt, wartet auf Prüfung', value: 'zu prüfen'}, {label: 'Vom Autor freigegeben', value: 'freigegeben'}]
+      - {name: body_en, label: Volltext (Englisch), widget: markdown, required: false, hint: 'Übersetzung des ganzen Artikels. Am einfachsten von Claude erstellen lassen.'}
+      - {name: key_de, label: Kernaussage (Deutsch), widget: text, required: false}
+      - {name: key_en, label: Kernaussage (Englisch), widget: text, required: false}
+      - {name: method_de, label: Datenbasis (Deutsch), widget: text, required: false}
+      - {name: method_en, label: Datenbasis (Englisch), widget: text, required: false}
+      - {name: link_en, label: Link zu einer englischen Fassung woanders, widget: string, required: false, hint: 'Nur falls der Autor selbst eine englische Fassung veröffentlicht hat. Sonst leer lassen.'}
       - {name: id, label: Kennung, widget: string, pattern: ['^[a-z0-9-]+$', 'Nur Kleinbuchstaben, Ziffern und Bindestriche'], hint: 'Kurzer Name für die Datei, z. B. week-9-vorschau. Nach dem Anlegen nicht mehr ändern.'}
 
   - name: autoren
@@ -88,4 +100,5 @@ collections:
       - {name: bio_de, label: Kurzprofil (Deutsch), widget: text, hint: 'Zwei, drei Sätze.'}
       - {name: bio_en, label: Kurzprofil (Englisch), widget: text, required: false}
       - {name: url, label: Website, widget: string, required: false, hint: 'Der Button im Profil heißt immer „Zur Website“.'}
+      - {name: consent, label: Übersetzung erlaubt, widget: boolean, default: false, hint: 'Der Autor hat zugestimmt, dass seine Texte übersetzt und im Volltext veröffentlicht werden.'}
       - {name: aut, label: Kürzel, widget: string, pattern: ['^[A-Z0-9]{2,4}$', '2 bis 4 Großbuchstaben, z. B. CP'], hint: 'Initialen. Nach dem Anlegen nicht mehr ändern.'}

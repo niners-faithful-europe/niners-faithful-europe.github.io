@@ -159,6 +159,15 @@ body.wm::before { content: ""; position: fixed; left: 0; right: 0; bottom: 0; he
 .pill-note { margin-top: 28px; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 14px; color: var(--muted); }
 .pill-note::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
 .body p { margin-top: 24px; font-size: 20px; line-height: 1.7; max-width: 64ch; }
+.body h2 { margin-top: 48px; font-size: 32px; line-height: 1.15; }
+.body h3 { margin-top: 36px; font-size: 24px; line-height: 1.2; }
+.body ul, .body ol { margin-top: 20px; padding-left: 1.3em; font-size: 20px; line-height: 1.7; max-width: 64ch; }
+.body li + li { margin-top: 6px; }
+.body blockquote { margin: 32px 0 0; padding: 4px 0 4px 22px; border-left: 4px solid var(--gold-hi); font-family: var(--serif); font-size: 24px; line-height: 1.4; }
+.body blockquote p { margin-top: 0; font-size: inherit; }
+.body table { margin-top: 28px; display: block; overflow-x: auto; }
+.body a { color: var(--primary); text-underline-offset: 3px; }
+.body img { margin-top: 28px; border-radius: 8px; }
 .teaser-big { margin-top: 32px; font-family: var(--serif); font-size: 26px; line-height: 1.4; }
 
 /* Stat Sheet */

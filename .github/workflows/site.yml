@@ -32,6 +32,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           if git diff --cached --quiet; then echo "Keine neuen Daten"; else git commit -m "Import: neue Entwürfe" && git pull --rebase -q && git push; fi
+      - run: pip install markdown==3.7
       - name: Seite bauen
         env:
           NFE_BASE: ${{ vars.NFE_BASE || '/niners-faithful-europe' }}

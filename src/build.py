@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Erzeugt das Provisorium von Niners Faithful Europe als statische Seiten (DE und EN)."""
-import json, os, shutil, sys
+import json, os, re, shutil, sys
 from figs import fig
 from html import escape as E
 
@@ -10,7 +10,7 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'site')
 # Pfad, unter dem die Seite liegt: auf GitHub Pages /niners-faithful-europe, mit eigener Domain leer
 P = os.environ.get('NFE_BASE', '').rstrip('/')
 
-PAGES = {'kickoff': '', 'playbook': 'playbook/', 'stats': 'stat-sheet/', 'lineup': 'line-up/', 'roster': 'roster/', 'plan': 'game-plan/', 'article': 'playbook/career-any-a/'}
+PAGES = {'kickoff': '', 'playbook': 'playbook/', 'stats': 'stat-sheet/', 'lineup': 'line-up/', 'roster': 'roster/', 'plan': 'game-plan/'}
 def url(lang, key): return f'{P}/{lang}/{PAGES[key]}'
 
 T = {
@@ -59,10 +59,16 @@ RUB = [('vorschau', 'Spielvorschau', 'Game previews'), ('nachbericht', 'Spielnac
 RUBN = {k: (d, e) for k, d, e in RUB}
 I = lambda lang: 0 if lang == 'de' else 1
 
+def has_en(a):
+    """Englischer Volltext vorhanden, vom Autor freigegeben und Übersetzung erlaubt."""
+    who = AUTH.get(a.get('aut') or '')
+    return bool(a.get('body_en')) and a.get('en_status') == 'freigegeben' and bool(who and who.get('consent'))
+def art_url(a, lang): return f'{P}/{lang}/playbook/{a["id"]}/'
+
 def art_link(a, lang):
     """Link eines Beitrags: DE immer zum Original, EN zur englischen Fassung, sonst zum deutschen Original."""
     if lang == 'de': return a['de'], True
-    if a['en'] == 'article': return url('en', 'article'), False
+    if has_en(a): return art_url(a, 'en'), False
     if a['en']: return a['en'], True
     return a['de'], True
 
@@ -75,8 +81,9 @@ PLAY = ('<svg viewBox="0 0 600 260" width="100%" height="100%" preserveAspectRat
         '<g fill="none" stroke="#E4C06E" stroke-width="3" stroke-linecap="round"><path d="M290 222 Q400 222 450 150 Q470 110 500 80"/><path d="M488 84 L500 80 L498 93"/></g>'
         '<g fill="none" stroke="#C8102E" stroke-width="3" stroke-linecap="round"><path d="M210 180 Q150 140 120 70"/><path d="M114 84 L120 70 L131 80"/></g></svg>')
 
-def page(lang, key, title, desc, body):
+def page(lang, key, title, desc, body, path=None):
     t = T[lang]; other = 'en' if lang == 'de' else 'de'
+    here = (lambda l: f'{P}/{l}/{path}') if path else (lambda l: url(l, key))
     nav = ''.join(f'<a href="{url(lang, k)}"' + (' aria-current="page"' if (k == key or (key == 'article' and k == 'playbook')) else '') + f'>{E(lbl)}</a>' for k, lbl in t['nav'])
     return f'''<!doctype html>
 <html lang="{lang}">
@@ -86,8 +93,8 @@ def page(lang, key, title, desc, body):
 <title>{E(title)} | Niners Faithful Europe</title>
 <meta name="description" content="{E(desc)}">
 <meta name="robots" content="noindex, nofollow">
-<link rel="alternate" hreflang="{lang}" href="{url(lang, key)}">
-<link rel="alternate" hreflang="{other}" href="{url(other, key)}">
+<link rel="alternate" hreflang="{lang}" href="{here(lang)}">
+<link rel="alternate" hreflang="{other}" href="{here(other)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@300..700&display=swap">
@@ -100,7 +107,7 @@ def page(lang, key, title, desc, body):
 <header class="site-head"><div class="wrap">
 <a class="brand" href="{url(lang, 'kickoff')}">Niners Faithful <span>Europe</span></a>
 <nav class="nav" aria-label="{t['navlabel']}">{nav}</nav>
-<div class="lang" role="group" aria-label="{t['langlabel']}"><a href="{url('de', key)}" lang="de"{' aria-current="true"' if lang == 'de' else ''}>DE</a><a href="{url('en', key)}" lang="en"{' aria-current="true"' if lang == 'en' else ''}>EN</a></div>
+<div class="lang" role="group" aria-label="{t['langlabel']}"><a href="{here('de')}" lang="de"{' aria-current="true"' if lang == 'de' else ''}>DE</a><a href="{here('en')}" lang="en"{' aria-current="true"' if lang == 'en' else ''}>EN</a></div>
 </div></header>
 {body}
 <footer class="site-foot"><div class="wrap"><span>{t['footer']}</span><span>{t['footer2']}</span></div></footer>
@@ -192,38 +199,37 @@ def playbook(lang):
     return page(lang, 'playbook', L['title'], L['intro'], body)
 
 # ---------------- Artikel Career ANY/A ----------------
-def article(lang):
-    a = ART_BY['career-any-a']; i = I(lang)
+def md(text):
+    """Markdown aus der Redaktion in HTML (Absätze, Zwischenüberschriften, Listen, Tabellen, Zitate, Links)."""
+    import markdown
+    html = markdown.markdown(text or '', extensions=['tables', 'sane_lists'])
+    return re.sub(r'<a href="(https?://[^"]+)"', r'<a href="\1" rel="noopener" target="_blank"', html)
+
+def article(a, lang):
+    i = I(lang); who = AUTH.get(a['aut'], {}); name = who.get('name') or a['author']
+    key = a.get(f'key_{lang}') or ''
+    method = a.get(f'method_{lang}') or ''
     if lang == 'en':
-        inner = f'''<p class="pill-note">English version by the author</p>
-<div class="body">
-<p>Brock Purdy leads the all-time list in Adjusted Net Yards per Pass Attempt with 8.00, and his margin of 0.61 over Patrick Mahomes is almost as large as the entire gap between Mahomes in second place and Russell Wilson in 16th (0.64). In early October Purdy even stood at 8.04, before two games at his normal level of around 7.0 pulled him back down a little.</p>
-<p>Anyone who hastily concludes from this that the last pick of the 2022 draft is the most efficient quarterback in NFL history should first take a look at what this number actually captures and, just as importantly, what it deliberately leaves out.</p>
-</div>
-<aside class="keybox" style="margin:44px 0 8px"><h2>KEY TAKEAWAY</h2><p>Purdy’s lead is real across several metrics, but his sample is still short: he only passed the 1,500-attempt minimum in October 2026.</p></aside>
-<div class="body"><p>Two details are also important for understanding the table. First, Pro Football Reference requires at least 1,500 pass attempts for the career list, a mark Purdy only passed this October: after six games of the 2026 season he stands at 1,524 attempts and 86 sacks, that is, 1,610 dropbacks. Second, sack data is only available from the early 1960s on, which is why Otto Graham or Sammy Baugh cannot appear at all.</p></div>
-<div class="actions" style="margin-top:32px"><a class="btn btn-primary" href="https://cp7.beer/projects/career-any-a-en/" rel="noopener" target="_blank">Read the full dossier</a></div>'''
-        origin = ('Original in German', 'This article first appeared in German with Chris Pracher on cp7.', 'Read the German original', a['de'])
-        basis = ('Data basis and method', 'Career ANY/A from Pro Football Reference, minimum 1,500 pass attempts, data as of October 20, 2026. Passer rating and ESPN Total QBR as cross-checks.')
-        back = 'Back to the playbook'
+        inner = (f'<p class="pill-note">Translated from German, approved by the author</p><div class="body">{md(a["body_en"])}</div>'
+                 + (f'<aside class="keybox" style="margin:44px 0 8px"><h2>KEY TAKEAWAY</h2><p>{E(key)}</p></aside>' if key else ''))
+        origin = ('Original in German', f'This article first appeared in German with {name} at {a["src"]}.', 'Read the German original', a['de'])
+        basis, back, other = 'Data basis and method', 'Back to the playbook', None
     else:
-        inner = f'''<p class="teaser-big">{E(a['teaser'][0])}</p>
-<aside class="keybox" style="margin:40px 0 8px"><h2>KERNAUSSAGE</h2><p>Purdys Vorsprung zeigt sich in mehreren Kennzahlen, die Stichprobe ist aber noch kurz: Die Mindestmarke von 1.500 Passversuchen hat er erst im Oktober 2026 überschritten.</p></aside>'''
-        origin = ('Das Original liegt beim Autor', 'Den vollständigen Text liest du bei Chris Pracher auf cp7. Die englische Fassung gibt es hier.', 'Original auf cp7 lesen', a['de'])
-        basis = ('Datenbasis und Methodik', 'Karriere-ANY/A nach Pro Football Reference, mindestens 1.500 Passversuche, Datenstand 20. Oktober 2026. Ergänzend Passer Rating und ESPN Total QBR.')
-        back = 'Zurück zum Playbook'
-    other = url('en', 'article') if lang == 'de' else None
+        inner = (f'<p class="teaser-big">{E(a["teaser"][0])}</p>'
+                 + (f'<aside class="keybox" style="margin:40px 0 8px"><h2>KERNAUSSAGE</h2><p>{E(key)}</p></aside>' if key else ''))
+        origin = ('Das Original liegt beim Autor', f'Den vollständigen Text liest du bei {name} ({a["src"]}). Die englische Fassung gibt es hier.', 'Original lesen', a['de'])
+        basis, back, other = 'Datenbasis und Methodik', 'Zurück zum Playbook', art_url(a, 'en')
     body = f'''<main id="main" class="wrap page"><div class="article">
 <a class="back" href="{url(lang, 'playbook')}">{BACK}{back}</a>
-<p class="meta" style="margin-top:28px"><b>{FMT['analyse'][i]}</b>  |  {E(RUBN['spieler'][i])}  |  Chris Pracher, cp7  |  {a['date'][i]}</p>
+<p class="meta" style="margin-top:28px"><b>{FMT[a['fmt']][i]}</b>  |  {E(RUBN[a['rub']][i])}  |  {E(name)}, {E(a['src'])}  |  {a['date'][i]}</p>
 <h1>{E(a['title'][i])}</h1>
 {inner}
-<section class="note" style="margin-top:40px"><h2>{basis[0]}</h2><p>{basis[1]}</p></section>
-<section class="panel-tint" style="margin-top:24px"><h2 style="font-size:28px">{origin[0]}</h2><p class="meta" style="font-size:17px">{origin[1]}</p>
+{f'<section class="note" style="margin-top:40px"><h2>{basis}</h2><p>{E(method)}</p></section>' if method else ''}
+<section class="panel-tint" style="margin-top:24px"><h2 style="font-size:28px">{origin[0]}</h2><p class="meta" style="font-size:17px">{E(origin[1])}</p>
 <div class="actions"><a class="btn btn-primary" href="{origin[3]}" rel="noopener" target="_blank">{origin[2]}</a>{f'<a class="btn btn-ghost" href="{other}" lang="en">English version</a>' if other else ''}</div></section>
-<p class="meta" style="margin-top:48px;padding-top:16px;border-top:2px solid var(--border);font-size:13px">Niners Faithful Europe  |  Chris Pracher  |  {a['date'][i]}</p>
+<p class="meta" style="margin-top:48px;padding-top:16px;border-top:2px solid var(--border);font-size:13px">Niners Faithful Europe  |  {E(name)}  |  {a['date'][i]}</p>
 </div></main>'''
-    return page(lang, 'article', a['title'][i], a['teaser'][i], body)
+    return page(lang, 'playbook', a['title'][i], a['teaser'][i], body, path=f'playbook/{a["id"]}/')
 
 # ---------------- Stat Sheet ----------------
 def stats(lang):
@@ -255,7 +261,7 @@ def stats(lang):
 <div class="meta" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding-top:14px;border-top:1px solid var(--border);font-size:13px"><span>{L['src']}</span><span style="font-family:var(--serif);color:var(--fg)">Niners Faithful <span style="color:var(--primary)">Europe</span></span></div>
 </figure>
 <p style="margin-top:32px;font-size:21px;line-height:1.55;max-width:62ch">{L['note']}</p>
-<div class="actions" style="margin-top:28px"><a class="btn btn-primary" href="{url(lang, 'article')}">{L['more']}</a><button type="button" class="btn btn-ghost" data-copy data-copied="{L['copied']}">{L['copy']}</button></div>
+<div class="actions" style="margin-top:28px"><a class="btn btn-primary" href="{art_url(ART_BY['career-any-a'], lang)}">{L['more']}</a><button type="button" class="btn btn-ghost" data-copy data-copied="{L['copied']}">{L['copy']}</button></div>
 <p class="meta" style="margin-top:16px">{L['credit']}</p>
 <details style="margin-top:28px;max-width:520px"><summary>{L['table']}</summary><table><thead><tr><th scope="col">{L['col']}</th><th scope="col">ANY/A</th></tr></thead><tbody>{rows}</tbody></table></details>
 </div>
@@ -395,7 +401,11 @@ shutil.copy(os.path.join(HERE, 'site.css'), os.path.join(OUT, 'assets', 'site.cs
 shutil.copy(os.path.join(HERE, 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
 shutil.copy(os.path.join(HERE, 'watermark.svg'), os.path.join(OUT, 'assets', 'watermark.svg'))
 for lang in ('de', 'en'):
-    for key, fn in [('kickoff', kickoff), ('playbook', playbook), ('article', article), ('stats', stats), ('lineup', lineup), ('roster', roster), ('plan', plan)]:
+    for a in ART:
+        if has_en(a):
+            d = os.path.join(OUT, lang, 'playbook', a['id']); os.makedirs(d, exist_ok=True)
+            open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(article(a, lang))
+    for key, fn in [('kickoff', kickoff), ('playbook', playbook), ('stats', stats), ('lineup', lineup), ('roster', roster), ('plan', plan)]:
         d = os.path.join(OUT, lang, PAGES[key]); os.makedirs(d, exist_ok=True)
         open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(fn(lang))
 # Redaktion: Sveltia CMS unter /admin/

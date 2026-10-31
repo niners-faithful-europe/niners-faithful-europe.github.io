@@ -1,4 +1,4 @@
-name: NEG-Archiv einlesen (einmalig)
+name: NEG-Archiv einlesen (mit Volltexten)
 on:
   workflow_dispatch:
     inputs:

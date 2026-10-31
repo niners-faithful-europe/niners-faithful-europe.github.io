@@ -13,6 +13,9 @@ Alles wird unter **`/admin/`** gepflegt (https://cpracher-cloud.github.io/niners
 
 **Anmelden:** „Sign In with Token“ und einen GitHub-Token eingeben (Fine-grained token, nur für dieses Repo, Berechtigung *Contents: Read and write*; anlegen unter GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens). Der Browser merkt sich die Anmeldung.
 
+## Englische Volltexte über Claude
+Beiträge einpflegen und übersetzen geht am einfachsten mit Claude (Claude Code mit Zugriff auf dieses Repo): Link oder Text schicken und sagen „pflege das ein und übersetze es“. Die Arbeitsweise steht in `CLAUDE.md` und im Skill `.claude/skills/beitrag-einpflegen/`. Die Übersetzung landet mit Status „Übersetzt, wartet auf Prüfung“ beim Beitrag; nach Freigabe durch den Autor auf „Vom Autor freigegeben“ setzen (Redaktion oder Claude). Der Volltext erscheint nur, wenn beim Autor „Übersetzung erlaubt“ angehakt ist.
+
 ## Aufbau
 - `data/articles/*.json`: ein Beitrag je Datei. `status`: `live`, `entwurf` oder `abgelehnt`.
 - `data/authors/*.json`: ein Autor je Datei.
