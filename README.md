@@ -14,12 +14,12 @@ Unabhängiges Fanprojekt, keine Verbindung zur NFL oder zu den San Francisco 49e
 
 ## Ablauf
 1. Täglich um 6:17 Uhr holt `.github/workflows/site.yml` neue Beiträge und legt zu jedem Entwurf ein **Issue** an („Freigabe: …“). GitHub schickt dazu eine Benachrichtigung (Mail/App).
-2. Im Issue Format, Rubrik und Autor per Häkchen prüfen, optional englischen Titel und Teaser eintragen.
+2. Im Issue Format, Rubrik und Autor per Häkchen prüfen (direkt anklicken). Anderer Autor oder englische Fassung: vor dem Schließen kommentieren, z. B. `Autor: Vorname Nachname`, `Titel EN: …`, `Teaser EN: …`.
 3. **Close as completed** = freigeben, **Close as not planned** = ablehnen. Der Workflow trägt das in `data/articles.json` ein und veröffentlicht die Seite neu.
 4. Überblick über offene Entwürfe: Inbox unter `/de/inbox/` oder die Issue-Liste.
 
 ## Autoren bearbeiten
-Die Profile im Line-up stehen in `data/authors.json`. Bearbeiten geht ohne Datei: In der Inbox (`/de/inbox/`) bei einem Autor auf **Bearbeiten** klicken (öffnet das Formular „Autor anlegen oder ändern“ mit den aktuellen Angaben), Text ändern, absenden. Neue Autoren über **Neuen Autor anlegen**, Entfernen über die Aktion „Entfernen“ mit Kürzel. Der Workflow übernimmt die Änderung, schließt das Issue und veröffentlicht die Seite neu. In Freigabe-Tickets kann unter „Neuer Autor“ auch direkt ein neuer Name eingetragen werden.
+Die Profile im Line-up stehen in `data/authors.json`. Bearbeiten geht ohne Datei: In der Inbox (`/de/inbox/`) bei einem Autor auf **Bearbeiten** klicken (öffnet das Formular „Autor anlegen oder ändern“ mit den aktuellen Angaben), Text ändern, absenden. Neue Autoren über **Neuen Autor anlegen**, Entfernen über die Aktion „Entfernen“ mit Kürzel. Der Workflow übernimmt die Änderung, schließt das Issue und veröffentlicht die Seite neu. In Freigabe-Tickets reicht ein Kommentar `Autor: Vorname Nachname`, ein neuer Name wird dabei angelegt.
 
 ## Hinweis Niner Empire Germany
 Der NEG-Feed und die Artikelseiten nennen keinen Autor. Neue NEG-Beiträge kommen deshalb als „Niner Empire Germany“ (Kürzel `NEG`) in die Inbox; bei der Freigabe `aut` und `author` auf den echten Autor setzen (z. B. `CP` / `Chris Pracher`). Podcast-Folgen („Ep. 395 …“) werden übersprungen.

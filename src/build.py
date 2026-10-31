@@ -393,7 +393,7 @@ def inbox(lang):
     people = ''.join(f'<div class="row"><span class="t"><h2>{E(x["name"])}</h2><span class="meta">Kürzel {E(x["aut"])}  |  {E(x.get("sub", ""))}  |  {len(posts_of(x["aut"]))} {"Beitrag" if len(posts_of(x["aut"])) == 1 else "Beiträge"}</span></span>'
                      f'<a class="btn btn-ghost" href="{E(edit(x))}" rel="noopener" target="_blank">Bearbeiten</a></div>' for x in AUTHORS)
     body = f'''<main id="main" class="wrap page"><h1 class="page-title">Inbox</h1>
-<p class="lead-text">{len(DRAFTS)} neue Beiträge warten auf Freigabe. Zu jedem gibt es ein Ticket: Häkchen für Format, Rubrik und Autor prüfen, dann <b>Close as completed</b> zum Freigeben oder <b>Close as not planned</b> zum Ablehnen. Die Seite aktualisiert sich danach von selbst.</p>
+<p class="lead-text">{len(DRAFTS)} neue Beiträge warten auf Freigabe. Zu jedem gibt es ein Ticket: Häkchen für Format, Rubrik und Autor direkt anklicken (anderer Autor: Kommentar <code>Autor: Name</code>), dann <b>Close as completed</b> zum Freigeben oder <b>Close as not planned</b> zum Ablehnen. Die Seite aktualisiert sich danach von selbst.</p>
 <div class="actions" style="margin:24px 0 8px"><a class="btn btn-ghost" href="{ISSUES}" rel="noopener" target="_blank">Alle offenen Tickets</a></div>
 <div class="rows">{rows}</div>
 <h2 class="page-title" style="font-size:40px;margin-top:64px">Autoren</h2>

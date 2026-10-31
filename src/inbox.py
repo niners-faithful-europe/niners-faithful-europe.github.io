@@ -84,9 +84,17 @@ def body(a, arts):
 
 {teaser}
 
-Häkchen bei Bedarf umsetzen (je Abschnitt eins; den Vorschlag musst du nicht abhaken), dann:
+**So geht's:** Häkchen einfach direkt anklicken (kein Bearbeiten nötig), dann
 - **Freigeben:** Issue schließen mit **Close as completed**
 - **Ablehnen:** Issue schließen mit **Close as not planned**
+
+**Anderer Autor oder englische Fassung?** Vor dem Schließen einen Kommentar schreiben, z. B.
+```
+Autor: Vorname Nachname
+Titel EN: English title
+Teaser EN: One or two sentences in English.
+```
+Ein neuer Name wird dabei gleich als Autor angelegt.
 
 ### Format
 {boxes(FMT, a['fmt'])}
@@ -97,13 +105,8 @@ Häkchen bei Bedarf umsetzen (je Abschnitt eins; den Vorschlag musst du nicht ab
 ### Autor
 {boxes(authors(arts), a['aut'])}
 
-Neuer Autor (Name, falls oben nicht dabei):
-
-### Englische Fassung (optional)
-Titel:
-Teaser:
-
-<!-- nfe-id: {a['id']} -->"""
+<!-- nfe-id: {a['id']} -->
+<!-- nfe-v2 -->"""
 
 
 def cmd_open():
@@ -116,6 +119,19 @@ def cmd_open():
         print(f"Issue #{issue['number']} für {a['id']}")
     if changed:
         save(arts)
+
+
+def cmd_refresh():
+    """Ältere Freigabe-Tickets einmalig auf die aktuelle Fassung bringen (angeklickte Häkchen bleiben bei neuen Tickets unberührt)."""
+    arts = load()
+    for a in arts:
+        n = a.get('imported', {}).get('issue')
+        if a['status'] != 'entwurf' or not n:
+            continue
+        cur = api('GET', f'/issues/{n}')
+        if cur['state'] == 'open' and '<!-- nfe-v2 -->' not in (cur.get('body') or ''):
+            api('PATCH', f'/issues/{n}', {'body': body(a, arts)})
+            print(f'Ticket #{n} aktualisiert')
 
 
 def section(text, name):
@@ -151,7 +167,15 @@ def cmd_review():
         if k:
             a['aut'] = k
             a['author'] = 'Niner Empire Germany' if k == 'NEG' else dict(auts)[k]
+        notes = '\n'.join(c['body'] for c in api('GET', f"/issues/{iss['number']}/comments?per_page=100"))
+        def note(key):
+            hits = re.findall(rf'^\s*{key}\s*:[ \t]*(.+)$', notes, re.M | re.I)
+            return hits[-1].strip() if hits else ''
+        if note('Titel EN'): a['title']['en'] = note('Titel EN')
+        if note('Teaser EN'): a['teaser']['en'] = note('Teaser EN')
         nm = re.search(r'^Neuer Autor[^:]*:[ \t]*(.+)$', section(text, 'Autor'), re.M)
+        if note('Autor'):
+            nm = re.match(r'(.+)', note('Autor'))
         if nm and nm.group(1).strip():
             people = load_authors()
             x, created = find_or_create(nm.group(1).strip(), people)
@@ -218,4 +242,4 @@ def cmd_author():
 
 
 if __name__ == '__main__':
-    {'open': cmd_open, 'review': cmd_review, 'author': cmd_author}[sys.argv[1]]()
+    {'open': cmd_open, 'refresh': cmd_refresh, 'review': cmd_review, 'author': cmd_author}[sys.argv[1]]()
