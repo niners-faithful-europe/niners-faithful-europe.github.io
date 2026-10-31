@@ -197,7 +197,8 @@
    "en": null
   },
   "imported": {
-   "source": "neg"
+   "source": "neg",
+   "issue": 1
   }
  },
  {
@@ -222,7 +223,8 @@
    "en": null
   },
   "imported": {
-   "source": "neg"
+   "source": "neg",
+   "issue": 2
   }
  }
 ]
