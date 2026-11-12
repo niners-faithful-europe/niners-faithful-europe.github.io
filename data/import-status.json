@@ -1,5 +1,5 @@
 {
- "neue_entwuerfe": 0,
+ "neue_entwuerfe": 1,
  "fehler": [],
  "autoren_in_feeds": {
   "neg": [
@@ -23,11 +23,11 @@
     "{http://wellformedweb.org/CommentAPI/}commentRss"
    ],
    "titel": [
+    "David zu Gast bei OurSF49ers Live",
+    "Ep. 398 – Cowboys loading – mit Valentin Rödiger",
     "Ep. 397 – Neuauflage des Battle of the Bay",
     "Ep. 396 – Die große Bestandsaufnahme zur Bye Week",
-    "Ein Reisetagebuch mit den San Francisco 49ers",
-    "Ep. 395 – Shit happens",
-    "#1 Passer-Rating? Purdys historische Statistiken im Check"
+    "Ein Reisetagebuch mit den San Francisco 49ers"
    ]
   }
  }
