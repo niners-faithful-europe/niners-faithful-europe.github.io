@@ -1,5 +1,5 @@
 {
- "neue_entwuerfe": 0,
+ "neue_entwuerfe": 1,
  "fehler": [],
  "autoren_in_feeds": {
   "neg": [
@@ -23,11 +23,11 @@
     "{http://wellformedweb.org/CommentAPI/}commentRss"
    ],
    "titel": [
+    "Watch-Partys 2026",
     "Ep. 400 – Jubiläumsfolge zum Topspiel in der NFC!",
     "München erschien in Rot und Gold!",
     "David zu Gast bei OurSF49ers Live",
-    "Ep. 398 – Cowboys loading – mit Valentin Rödiger",
-    "Ep. 397 – Neuauflage des Battle of the Bay"
+    "Ep. 398 – Cowboys loading – mit Valentin Rödiger"
    ]
   }
  }
