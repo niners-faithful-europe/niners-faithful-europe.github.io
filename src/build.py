@@ -67,9 +67,12 @@ def art_url(a, lang): return f'{P}/{lang}/playbook/{a["id"]}/'
 
 def art_link(a, lang):
     """Link eines Beitrags: DE immer zum Original, EN zur englischen Fassung, sonst zum deutschen Original."""
-    if lang == 'de': return a['de'], True
+    if lang == 'de':
+        if a.get('body_de') and not a['de']: return art_url(a, 'de'), False
+        return a['de'], True
     if has_en(a): return art_url(a, 'en'), False
     if a['en']: return a['en'], True
+    if a.get('body_de') and not a['de']: return art_url(a, 'de'), False
     return a['de'], True
 
 def ext(href): return ' rel="noopener" target="_blank"' if href.startswith('http') else ''
@@ -212,21 +215,30 @@ def article(a, lang):
     if lang == 'en':
         inner = (f'<p class="pill-note">Translated from German, approved by the author</p><div class="body">{md(a["body_en"])}</div>'
                  + (f'<aside class="keybox" style="margin:44px 0 8px"><h2>KEY TAKEAWAY</h2><p>{E(key)}</p></aside>' if key else ''))
-        origin = ('Original in German', f'This article first appeared in German with {name} at {a["src"]}.', 'Read the German original', a['de'])
+        origin = ('Original in German', f'This article first appeared in German with {name} at {a["src"]}.', 'Read the German original', a['de'] or (art_url(a, 'de') if a.get('body_de') else ''))
         basis, back, other = 'Data basis and method', 'Back to the playbook', None
     else:
-        inner = (f'<p class="teaser-big">{E(a["teaser"][0])}</p>'
+        teaser_or_body = f'<div class="body">{md(a["body_de"])}</div>' if a.get('body_de') else f'<p class="teaser-big">{E(a["teaser"][0])}</p>'
+        inner = (teaser_or_body
                  + (f'<aside class="keybox" style="margin:40px 0 8px"><h2>KERNAUSSAGE</h2><p>{E(key)}</p></aside>' if key else ''))
         origin = ('Das Original liegt beim Autor', f'Den vollständigen Text liest du bei {name} ({a["src"]}). Die englische Fassung gibt es hier.', 'Original lesen', a['de'])
-        basis, back, other = 'Datenbasis und Methodik', 'Zurück zum Playbook', art_url(a, 'en')
+        basis, back, other = 'Datenbasis und Methodik', 'Zurück zum Playbook', (art_url(a, 'en') if has_en(a) else None)
+    # Ohne Original-Link (nur deutscher Volltext hier): Original-Block weglassen, nur Sprachwechsel anbieten
+    if origin[3] and not (lang == 'de' and a.get('body_de') and not a['de']):
+        eng = f'<a class="btn btn-ghost" href="{other}" lang="en">English version</a>' if other else ''
+        origin_html = (f'<section class="panel-tint" style="margin-top:24px"><h2 style="font-size:28px">{origin[0]}</h2><p class="meta" style="font-size:17px">{E(origin[1])}</p>'
+                       f'<div class="actions"><a class="btn btn-primary" href="{origin[3]}" rel="noopener" target="_blank">{origin[2]}</a>{eng}</div></section>')
+    elif other:
+        origin_html = f'<section class="panel-tint" style="margin-top:24px"><div class="actions"><a class="btn btn-primary" href="{other}" lang="en">English version</a></div></section>'
+    else:
+        origin_html = ''
     body = f'''<main id="main" class="wrap page"><div class="article">
 <a class="back" href="{url(lang, 'playbook')}">{BACK}{back}</a>
 <p class="meta" style="margin-top:28px"><b>{FMT[a['fmt']][i]}</b>  |  {E(RUBN[a['rub']][i])}  |  {E(name)}, {E(a['src'])}  |  {a['date'][i]}</p>
 <h1>{E(a['title'][i])}</h1>
 {inner}
 {f'<section class="note" style="margin-top:40px"><h2>{basis}</h2><p>{E(method)}</p></section>' if method else ''}
-<section class="panel-tint" style="margin-top:24px"><h2 style="font-size:28px">{origin[0]}</h2><p class="meta" style="font-size:17px">{E(origin[1])}</p>
-<div class="actions"><a class="btn btn-primary" href="{origin[3]}" rel="noopener" target="_blank">{origin[2]}</a>{f'<a class="btn btn-ghost" href="{other}" lang="en">English version</a>' if other else ''}</div></section>
+{origin_html}
 <p class="meta" style="margin-top:48px;padding-top:16px;border-top:2px solid var(--border);font-size:13px">Niners Faithful Europe  |  {E(name)}  |  {a['date'][i]}</p>
 </div></main>'''
     return page(lang, 'playbook', a['title'][i], a['teaser'][i], body, path=f'playbook/{a["id"]}/')
@@ -402,7 +414,7 @@ shutil.copy(os.path.join(HERE, 'site.js'), os.path.join(OUT, 'assets', 'site.js'
 shutil.copy(os.path.join(HERE, 'watermark.svg'), os.path.join(OUT, 'assets', 'watermark.svg'))
 for lang in ('de', 'en'):
     for a in ART:
-        if has_en(a):
+        if has_en(a) or (lang == 'de' and a.get('body_de') and not a['de']):
             d = os.path.join(OUT, lang, 'playbook', a['id']); os.makedirs(d, exist_ok=True)
             open(os.path.join(d, 'index.html'), 'w', encoding='utf-8').write(article(a, lang))
     for key, fn in [('kickoff', kickoff), ('playbook', playbook), ('stats', stats), ('lineup', lineup), ('roster', roster), ('plan', plan)]:

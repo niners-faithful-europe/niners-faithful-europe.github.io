@@ -70,6 +70,7 @@ collections:
         default: ''
         hint: 'Erscheint erst bei „Vom Autor freigegeben“ und wenn der Autor der Übersetzung zugestimmt hat.'
         options: [{label: 'Kein Volltext', value: ''}, {label: 'Übersetzt, wartet auf Prüfung', value: 'zu prüfen'}, {label: 'Vom Autor freigegeben', value: 'freigegeben'}]
+      - {name: body_de, label: Volltext (Deutsch), widget: markdown, required: false, hint: 'Nur ausfüllen, solange es noch kein Original gibt. Dann bleibt „Link zum Original“ leer.'}
       - {name: body_en, label: Volltext (Englisch), widget: markdown, required: false, hint: 'Übersetzung des ganzen Artikels. Am einfachsten von Claude erstellen lassen.'}
       - {name: key_de, label: Kernaussage (Deutsch), widget: text, required: false}
       - {name: key_en, label: Kernaussage (Englisch), widget: text, required: false}
